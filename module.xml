@@ -1,0 +1,38 @@
+<module>
+	<rawname>pm2</rawname>
+	<repo>commercial</repo>
+	<name>Phone Apps</name>
+	<version>13.0.1</version>
+	<publisher>Sangoma Technologies Corporation</publisher>
+	<license>AGPLv3+</license>
+	<licenselink>http://www.gnu.org/licenses/agpl-3.0.txt</licenselink>
+	<category>Admin</category>
+	<description>Thie module manages background processes for your PBX</description>
+	<changelog>
+		*13.0.1* Inital Release
+	</changelog>
+	<menuitems>
+		<pm2>Process Management</pm2>
+	</menuitems>
+	<hooks>
+		<dashboard class="Overview" namespace="FreePBX\modules\Dashboard\Sections">
+			<method callingMethod="getSummary" class="Pm2" namespace="FreePBX\Modules">dashboardService</method>
+		</dashboard>
+		<framework class="Chown" namespace="FreePBX\Console\Command">
+			<method callingMethod="fwcChownFiles" class="Pm2" namespace="FreePBX\modules">chownFreepbx</method>
+		</framework>
+		<framework class="Start" namespace="FreePBX\Console\Command">
+			<method callingMethod="postAsteriskHooks" class="Pm2" namespace="FreePBX\Modules">startFreepbx</method>
+		</framework>
+		<framework class="Stop" namespace="FreePBX\Console\Command">
+			<method callingMethod="preAsteriskHooks" class="Pm2" namespace="FreePBX\Modules">stopFreepbx</method>
+		</framework>
+		<framework class="Reload" namespace="FreePBX">
+			<method callingMethod="postReload" class="Pm2" namespace="FreePBX\Modules">postReloadFreepbx</method>
+			<method callingMethod="preReload" class="Pm2" namespace="FreePBX\Modules">preReloadFreepbx</method>
+		</framework>
+	</hooks>
+	<supported>
+		<version>13.0</version>
+	</supported>
+</module>
