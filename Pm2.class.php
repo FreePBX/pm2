@@ -213,6 +213,19 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	}
 
 	/**
+	 * Reset counters for application
+	 * @method update
+	 */
+	public function reset($name) {
+		$name = $this->cleanAppName($name);
+		$out = $this->getStatus($name);
+		if(empty($out)) {
+			throw new \Exception("There is no process by that name");
+		}
+		$this->runPM2Command("reset ".$name);
+	}
+
+	/**
 	 * List Processes that PM2 is maintaining
 	 * @method listProcesses
 	 * @return array        Array of processes
