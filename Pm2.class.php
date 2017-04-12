@@ -209,7 +209,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	 * @method update
 	 */
 	public function update() {
-		$this->runPM2Command("update",true);
+		$this->runPM2Command("update",'',true);
 	}
 
 	/**
