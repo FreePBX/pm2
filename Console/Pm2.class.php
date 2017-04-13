@@ -23,6 +23,7 @@ class Pm2 extends Command {
 			new InputOption('restart', null, InputOption::VALUE_REQUIRED, _('Restart Process')),
 			new InputOption('delete', null, InputOption::VALUE_REQUIRED, _('Delete Process')),
 			new InputOption('update', null, InputOption::VALUE_NONE, _('Save processes, kill PM2 and restore processes')),
+			new InputOption('reload-logs', null, InputOption::VALUE_NONE, _('Reload all log file pointers')),
 			new InputOption('log', null, InputOption::VALUE_REQUIRED, _('Stream Logs from Process')),
 			new InputOption('lines', null, InputOption::VALUE_REQUIRED, _('How many lines to stream'))
 		));
@@ -95,6 +96,11 @@ class Pm2 extends Command {
 			$app = $input->getOption('delete');
 			\FreePBX::Pm2()->delete($app);
 			$output->writeln("Process Stopped and Deleted");
+			return;
+		}
+		if($input->getOption('reload-logs')){
+			\FreePBX::Pm2()->reloadLogs();
+			$output->writeln("All logs reloaded");
 			return;
 		}
 		$this->outputHelp($input,$output);

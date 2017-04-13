@@ -225,6 +225,10 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$this->runPM2Command("reset ".$name);
 	}
 
+	public function reloadLogs() {
+		$this->runPM2Command("reloadLogs");
+	}
+
 	/**
 	 * List Processes that PM2 is maintaining
 	 * @method listProcesses
