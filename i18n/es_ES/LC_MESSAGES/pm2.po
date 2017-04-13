@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-12 13:49-0400\n"
+"POT-Creation-Date: 2017-04-12 20:54-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,14 +21,14 @@ msgstr ""
 msgid "Admin"
 msgstr ""
 
-#: Pm2.class.php:296
+#: Pm2.class.php:300
 #, php-format
 msgid ""
 "Asterisk home dir (%s) doesn't exist, and, ASTSPOOLDIR doesn't exist. "
 "Aborting"
 msgstr ""
 
-#: Console/Pm2.class.php:34
+#: Console/Pm2.class.php:35
 msgid "CPU"
 msgstr ""
 
@@ -45,7 +45,7 @@ msgstr ""
 msgid "Home directory [%s] is not writable"
 msgstr ""
 
-#: Console/Pm2.class.php:27
+#: Console/Pm2.class.php:28
 msgid "How many lines to stream"
 msgstr ""
 
@@ -61,7 +61,7 @@ msgstr ""
 msgid "Manage long running processes"
 msgstr ""
 
-#: Console/Pm2.class.php:34
+#: Console/Pm2.class.php:35
 msgid "Mem"
 msgstr ""
 
@@ -91,15 +91,19 @@ msgstr ""
 msgid "Process Management"
 msgstr ""
 
-#: Console/Pm2.class.php:34
+#: Console/Pm2.class.php:35
 msgid "Process Name"
+msgstr ""
+
+#: Console/Pm2.class.php:26
+msgid "Reload all log file pointers"
 msgstr ""
 
 #: Console/Pm2.class.php:23
 msgid "Restart Process"
 msgstr ""
 
-#: Console/Pm2.class.php:34
+#: Console/Pm2.class.php:35
 msgid "Restarts"
 msgstr ""
 
@@ -107,7 +111,7 @@ msgstr ""
 msgid "Save processes, kill PM2 and restore processes"
 msgstr ""
 
-#: Console/Pm2.class.php:34
+#: Console/Pm2.class.php:35
 msgid "Status"
 msgstr ""
 
@@ -115,7 +119,7 @@ msgstr ""
 msgid "Stop Process"
 msgstr ""
 
-#: Console/Pm2.class.php:26
+#: Console/Pm2.class.php:27
 msgid "Stream Logs from Process"
 msgstr ""
 
@@ -128,6 +132,6 @@ msgstr ""
 msgid "Thie module manages background processes for your PBX"
 msgstr ""
 
-#: Console/Pm2.class.php:34
+#: Console/Pm2.class.php:35
 msgid "Uptime"
 msgstr ""
