@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-12 20:54-0400\n"
+"POT-Creation-Date: 2017-04-14 18:08-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -87,7 +87,7 @@ msgid ""
 "as root"
 msgstr ""
 
-#: pm2.i18n.php:4 /usr/src/freepbx/pm2/pm2.i18n.php:10
+#: pm2.i18n.php:4
 msgid "Process Management"
 msgstr ""
 
@@ -129,7 +129,7 @@ msgid "There was an error installing. Please review the install log. (%s)"
 msgstr ""
 
 #: pm2.i18n.php:8
-msgid "Thie module manages background processes for your PBX"
+msgid "This module manages background processes for your PBX"
 msgstr ""
 
 #: Console/Pm2.class.php:35
