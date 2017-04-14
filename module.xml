@@ -2,20 +2,18 @@
 	<rawname>pm2</rawname>
 	<repo>standard</repo>
 	<name>Process Management</name>
-	<version>13.0.3</version>
+	<version>13.0.3.1</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>AGPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/agpl-3.0.txt</licenselink>
 	<category>Admin</category>
-	<description>Thie module manages background processes for your PBX</description>
+	<description>This module manages background processes for your PBX</description>
 	<changelog>
+		*13.0.3.1* Remove GUI menu
 		*13.0.3* Support reloading logs
 		*13.0.2* Add reset command
 		*13.0.1* Inital Release
 	</changelog>
-	<menuitems>
-		<pm2>Process Management</pm2>
-	</menuitems>
 	<hooks>
 		<framework class="Chown" namespace="FreePBX\Console\Command">
 			<method callingMethod="fwcChownFiles" class="Pm2" namespace="FreePBX\modules">chownFreepbx</method>
