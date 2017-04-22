@@ -242,6 +242,14 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	public function listProcesses() {
 		$output = $this->runPM2Command("jlist");
 		$processes = json_decode($output,true);
+		//check for errors because of this:
+		// [PM2] Spawning PM2 daemon with pm2_home=/home/asterisk/.pm2
+		// [PM2] PM2 Successfully daemonized
+		if(json_last_error() !== JSON_ERROR_NONE) {
+			$output = $this->runPM2Command("jlist");
+			$processes = json_decode($output,true);
+		}
+		$processes = (!empty($processes) && is_array($processes)) ? $processes : array();
 		$final = array();
 		foreach($processes as $process) {
 			$process['pm2_env']['created_at_human_diff'] = ($process['pm2_env']['status'] == 'online') ? $this->get_date_diff(time(),(int)round($process['pm2_env']['created_at']/1000)) : 0;
