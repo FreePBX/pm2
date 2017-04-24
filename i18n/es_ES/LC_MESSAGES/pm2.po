@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-21 20:03-0400\n"
+"POT-Creation-Date: 2017-04-24 17:27-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "Admin"
 msgstr ""
 
-#: Pm2.class.php:313
+#: Pm2.class.php:335
 #, php-format
 msgid ""
 "Asterisk home dir (%s) doesn't exist, and, ASTSPOOLDIR doesn't exist. "
@@ -36,11 +36,11 @@ msgstr ""
 msgid "Delete Process"
 msgstr ""
 
-#: Pm2.class.php:103
+#: Pm2.class.php:125
 msgid "Finished updating libraries!"
 msgstr ""
 
-#: Pm2.class.php:53 /usr/src/freepbx/pm2/Pm2.class.php:60
+#: Pm2.class.php:53 /usr/src/freepbx/pm2/Pm2.class.php:63
 #, php-format
 msgid "Home directory [%s] is not writable"
 msgstr ""
@@ -49,7 +49,7 @@ msgstr ""
 msgid "How many lines to stream"
 msgstr ""
 
-#: Pm2.class.php:65
+#: Pm2.class.php:87
 msgid "Installing/Updating Required Libraries. This may take a while..."
 msgstr ""
 
@@ -87,7 +87,7 @@ msgid ""
 "as root"
 msgstr ""
 
-#: pm2.i18n.php:4
+#: pm2.i18n.php:4 /usr/src/freepbx/pm2/pm2.i18n.php:12
 msgid "Process Management"
 msgstr ""
 
@@ -123,7 +123,7 @@ msgstr ""
 msgid "Stream Logs from Process"
 msgstr ""
 
-#: Pm2.class.php:106
+#: Pm2.class.php:128
 #, php-format
 msgid "There was an error installing. Please review the install log. (%s)"
 msgstr ""
@@ -132,6 +132,16 @@ msgstr ""
 msgid "This module manages background processes for your PBX"
 msgstr ""
 
+#: pm2.i18n.php:14
+msgid ""
+"This should only be turned on if you have issues installing node modules "
+"from NPM"
+msgstr ""
+
 #: Console/Pm2.class.php:35
 msgid "Uptime"
+msgstr ""
+
+#: pm2.i18n.php:10
+msgid "Use mirror proxy server for NPM"
 msgstr ""
