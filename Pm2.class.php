@@ -57,10 +57,32 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		if(file_exists($this->getHomeDir()."/.npm")) {
 			$data = posix_getgrgid(filegroup($this->getHomeDir()."/.npm"));
 			if($data['name'] != $webgroup) {
-				out(sprintf(_("Home directory [%s] is not writable"),$this->getHomeDir()."/.npm"));
-				return false;
+				if (posix_getuid() == 0) {
+					exec("chown -R ".$webuser." ".$this->getHomeDir()."/.npm");
+				} else {
+					out(sprintf(_("Home directory [%s] is not writable"),$this->getHomeDir()."/.npm"));
+					return false;
+				}
+
 			}
 		}
+
+		$set = array();
+		$set['module'] = 'pm2';
+		$set['category'] = 'Process Management';
+
+		// PM2USEPROXY
+		$set['value'] = false;
+		$set['defaultval'] =& $set['value'];
+		$set['options'] = '';
+		$set['name'] = 'Use mirror proxy server for NPM';
+		$set['description'] = 'This should only be turned on if you have issues installing node modules from NPM';
+		$set['emptyok'] = 0;
+		$set['level'] = 1;
+		$set['readonly'] = 1;
+		$set['type'] = CONF_TYPE_BOOL;
+		$this->freepbx->Config->define_conf_setting('PM2USEPROXY',$set);
+		$this->freepbx->Config->commit_conf_settings();
 
 		outn(_("Installing/Updating Required Libraries. This may take a while..."));
 		if (php_sapi_name() == "cli") {
@@ -155,7 +177,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	 * @param  string $process The process to run
 	 * @return mixed           Output of getStatus
 	 */
-	public function start($name, $process) {
+	public function start($name, $process, $environment=array()) {
 		$name = $this->cleanAppName($name);
 		$pout = $this->getStatus($name);
 		if(!empty($pout) && $pout['pm2_env']['status'] == 'online') {
@@ -163,7 +185,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		}
 		$astlogdir = $this->freepbx->Config->get("ASTLOGDIR");
 		$cwd = dirname($process);
-		$this->runPM2Command("start ".$process." --name ".escapeshellarg($name)." -e ".escapeshellarg($astlogdir."/".$name."_err.log")." -o ".escapeshellarg($astlogdir."/".$name."_out.log")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'", $cwd);
+		$this->runPM2Command("start ".$process." --name ".escapeshellarg($name)." -e ".escapeshellarg($astlogdir."/".$name."_err.log")." -o ".escapeshellarg($astlogdir."/".$name."_out.log")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'", $cwd, $environment);
 		return $this->getStatus($name);
 	}
 
@@ -214,7 +236,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	 * @method update
 	 */
 	public function update() {
-		$this->runPM2Command("update",'',true);
+		$this->runPM2Command("update",'',array(),true);
 	}
 
 	/**
@@ -265,8 +287,8 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	 * @param  string        $cmd    The command to run
 	 * @param  boolean       $stream Whether to stream the output or return it
 	 */
-	private function runPM2Command($cmd,$cwd='',$stream=false) {
-		$command = $this->generateRunAsAsteriskCommand($this->nodeloc."/node_modules/pm2/bin/pm2 ".$cmd,$cwd);
+	private function runPM2Command($cmd,$cwd='',$environment=array(),$stream=false) {
+		$command = $this->generateRunAsAsteriskCommand($this->nodeloc."/node_modules/pm2/bin/pm2 ".$cmd,$cwd,$environment);
 		$process = new Process($command);
 		if(!$stream) {
 			$process->mustRun();
@@ -322,25 +344,58 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	 * @param  string                       $command The command to run
 	 * @return string                                The finalized command
 	 */
-	private function generateRunAsAsteriskCommand($command,$cwd='') {
+	private function generateRunAsAsteriskCommand($command,$cwd='',$environment=array()) {
 		$webuser = $this->freepbx->Config->get('AMPASTERISKWEBUSER');
 		$webgroup = $this->freepbx->Config->get('AMPASTERISKWEBGROUP');
 		$webroot = $this->freepbx->Config->get("AMPWEBROOT");
 		$varlibdir = $this->freepbx->Config->get("ASTVARLIBDIR");
 		$astlogdir = $this->freepbx->Config->get("ASTLOGDIR");
 
+		$npmrc = $this->getHomeDir() . "/.npmrc";
+		if(!file_exists($npmrc)) {
+			touch($npmrc);
+			if (posix_getuid() == 0) {
+				chown($npmrc,$webuser);
+			}
+		}
+
+		$ini = parse_ini_file($npmrc, false, INI_SCANNER_RAW);
+		$ini = is_array($ini) ? $ini : array();
+		$ini['prefix'] = '~/.node';
+		if($this->freepbx->Config->get('PM2USEPROXY')) {
+			$ini['proxy'] = 'http://mirror.freepbx.org:6767/';
+			$ini['https-proxy'] = 'http://mirror.freepbx.org:6767/';
+			$ini['strict-ssl'] = 'false';
+		} else {
+			unset($ini['proxy'],$ini['https-proxy'],$ini['strict-ssl']);
+		}
+
+		$this->write_php_ini($npmrc,$ini);
+
 		$cmds = array(
 			'cd '.(!empty($cwd) ? $cwd : $this->nodeloc),
 			'mkdir -p '.$this->pm2Home,
-			'mkdir -p '.$this->nodeloc.'/logs',
+			'mkdir -p '.$this->nodeloc.'/logs'
+		);
+
+		foreach($environment as $env) {
+			if(is_array($env)) {
+				foreach($env as $k => $v) {
+					$cmds[] = 'export '.escapeshellarg($k).'='.escapeshellarg($k);
+				}
+			} else {
+				$cmds[] = 'export '.escapeshellarg($env);
+			}
+		}
+
+		$cmds = array_merge($cmds,array(
 			'export HOME="'.$this->getHomeDir().'"',
-			'echo "prefix = ~/.node" > ~/.npmrc',
 			'export PM2_HOME="'.$this->pm2Home.'"',
 			'export ASTLOGDIR="'.$astlogdir.'"',
 			'export PATH="$HOME/.node/bin:$PATH"',
 			'export NODE_PATH="$HOME/.node/lib/node_modules:$NODE_PATH"',
 			'export MANPATH="$HOME/.node/share/man:$MANPATH"'
-		);
+		));
 		$cmds[] = $command;
 		$final = implode(" && ", $cmds);
 
@@ -436,10 +491,45 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		return implode( ", ", $times );
 	}
 
-	function human_filesize($bytes, $dec = 2) {
+	private function human_filesize($bytes, $dec = 2) {
 		$size   = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
 		$factor = floor((strlen($bytes) - 1) / 3);
 
 		return sprintf("%.{$dec}f", $bytes / pow(1024, $factor)) . @$size[$factor];
+	}
+
+	function write_php_ini($file, $array) {
+		$res = array();
+		foreach($array as $key => $val) {
+			if(is_array($val)) {
+				$res[] = "[$key]";
+				foreach($val as $skey => $sval) {
+					$res[] = "$skey = ".(is_numeric($sval) ? $sval : '"'.$sval.'"');
+				};
+			} else {
+				$res[] = "$key = ".(is_numeric($val) ? $val : '"'.$val.'"');
+			};
+		}
+		$this->safefilerewrite($file, implode("\r\n", $res));
+	}
+
+	function safefilerewrite($fileName, $dataToSave) {
+		if ($fp = fopen($fileName, 'w')) {
+			$startTime = microtime(TRUE);
+			do {
+				$canWrite = flock($fp, LOCK_EX);
+				// If lock not obtained sleep for 0 - 100 milliseconds, to avoid collision and CPU load
+				if(!$canWrite) {
+					usleep(round(rand(0, 100)*1000));
+				};
+			} while ((!$canWrite)and((microtime(TRUE)-$startTime) < 5));
+
+			//file was locked so now we can store information
+			if ($canWrite) {
+				fwrite($fp, $dataToSave);
+				flock($fp, LOCK_UN);
+			}
+			fclose($fp);
+		}
 	}
 }
