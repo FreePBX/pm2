@@ -372,6 +372,12 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			}
 		}
 
+		$cmds = array(
+			'cd '.(!empty($cwd) ? $cwd : $this->nodeloc),
+			'mkdir -p '.$this->pm2Home,
+			'mkdir -p logs'
+		);
+
 		$ini = parse_ini_file($npmrc, false, INI_SCANNER_RAW);
 		$ini = is_array($ini) ? $ini : array();
 		$ini['prefix'] = '~/.node';
@@ -379,17 +385,12 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			$ini['proxy'] = $this->freepbx->Config->get('PM2PROXY');
 			$ini['https-proxy'] = $this->freepbx->Config->get('PM2PROXY');
 			$ini['strict-ssl'] = 'false';
+			$cmds[] = 'export NODE_TLS_REJECT_UNAUTHORIZED=0';
 		} else {
 			unset($ini['proxy'],$ini['https-proxy'],$ini['strict-ssl']);
 		}
 
 		$this->write_php_ini($npmrc,$ini);
-
-		$cmds = array(
-			'cd '.(!empty($cwd) ? $cwd : $this->nodeloc),
-			'mkdir -p '.$this->pm2Home,
-			'mkdir -p logs'
-		);
 
 		foreach($environment as $env) {
 			if(is_array($env)) {
