@@ -75,13 +75,25 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$set['value'] = false;
 		$set['defaultval'] =& $set['value'];
 		$set['options'] = '';
-		$set['name'] = 'Use mirror proxy server for NPM';
+		$set['name'] = 'Use Proxy Server for NPM';
 		$set['description'] = 'This should only be turned on if you have issues installing node modules from NPM';
 		$set['emptyok'] = 0;
 		$set['level'] = 1;
 		$set['readonly'] = 1;
 		$set['type'] = CONF_TYPE_BOOL;
 		$this->freepbx->Config->define_conf_setting('PM2USEPROXY',$set);
+
+		// NODEJSBINDADDRESS
+		$set['value'] = 'http://mirror.freepbx.org:6767/';
+		$set['defaultval'] =& $set['value'];
+		$set['options'] = '';
+		$set['name'] = 'NPM Proxy Server Address';
+		$set['description'] = 'The NPM Proxy server address to use';
+		$set['emptyok'] = 0;
+		$set['type'] = CONF_TYPE_TEXT;
+		$set['level'] = 2;
+		$set['readonly'] = 1;
+		$this->freepbx->Config->define_conf_setting('PM2PROXY',$set);
 		$this->freepbx->Config->commit_conf_settings();
 
 		outn(_("Installing/Updating Required Libraries. This may take a while..."));
@@ -342,9 +354,10 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	 * Generate run command string
 	 * @method generateRunAsAsteriskCommand
 	 * @param  string                       $command The command to run
+	 * @param  string                       $environment Array of environment variables to run
 	 * @return string                                The finalized command
 	 */
-	private function generateRunAsAsteriskCommand($command,$cwd='',$environment=array()) {
+	public function generateRunAsAsteriskCommand($command,$cwd='',$environment=array()) {
 		$webuser = $this->freepbx->Config->get('AMPASTERISKWEBUSER');
 		$webgroup = $this->freepbx->Config->get('AMPASTERISKWEBGROUP');
 		$webroot = $this->freepbx->Config->get("AMPWEBROOT");
@@ -363,8 +376,8 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$ini = is_array($ini) ? $ini : array();
 		$ini['prefix'] = '~/.node';
 		if($this->freepbx->Config->get('PM2USEPROXY')) {
-			$ini['proxy'] = 'http://mirror.freepbx.org:6767/';
-			$ini['https-proxy'] = 'http://mirror.freepbx.org:6767/';
+			$ini['proxy'] = $this->freepbx->Config->get('PM2PROXY');
+			$ini['https-proxy'] = $this->freepbx->Config->get('PM2PROXY');
 			$ini['strict-ssl'] = 'false';
 		} else {
 			unset($ini['proxy'],$ini['https-proxy'],$ini['strict-ssl']);
@@ -375,7 +388,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$cmds = array(
 			'cd '.(!empty($cwd) ? $cwd : $this->nodeloc),
 			'mkdir -p '.$this->pm2Home,
-			'mkdir -p '.$this->nodeloc.'/logs'
+			'mkdir -p logs'
 		);
 
 		foreach($environment as $env) {
@@ -392,6 +405,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			'export HOME="'.$this->getHomeDir().'"',
 			'export PM2_HOME="'.$this->pm2Home.'"',
 			'export ASTLOGDIR="'.$astlogdir.'"',
+			'export ASTVARLIBDIR="'.$varlibdir.'"',
 			'export PATH="$HOME/.node/bin:$PATH"',
 			'export NODE_PATH="$HOME/.node/lib/node_modules:$NODE_PATH"',
 			'export MANPATH="$HOME/.node/share/man:$MANPATH"'
