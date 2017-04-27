@@ -378,7 +378,9 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			'mkdir -p logs'
 		);
 
-		$ini = parse_ini_file($npmrc, false, INI_SCANNER_RAW);
+		$contents = file_get_contents($npmrc);
+		$contents .= "\n";
+		$ini = parse_ini_string($contents, false, INI_SCANNER_RAW);
 		$ini = is_array($ini) ? $ini : array();
 		$ini['prefix'] = '~/.node';
 		if($this->freepbx->Config->get('PM2USEPROXY')) {

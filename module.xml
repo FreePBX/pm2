@@ -2,13 +2,14 @@
 	<rawname>pm2</rawname>
 	<repo>standard</repo>
 	<name>Process Management</name>
-	<version>13.0.3.6</version>
+	<version>13.0.3.7</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>AGPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/agpl-3.0.txt</licenselink>
 	<category>Admin</category>
 	<description>This module manages background processes for your PBX</description>
 	<changelog>
+		*13.0.3.7* FREEPBX-14654 Add newline for PHP bugs
 		*13.0.3.6* When proxying dont verify TLS
 		*13.0.3.5* Add more options to proxy addresses
 		*13.0.3.4* Add ability to use mirrors as a proxy cache
