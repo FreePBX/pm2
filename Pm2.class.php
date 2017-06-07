@@ -323,9 +323,9 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		return $home;
 	}
 
-	public function installNodeDependencies($cwd='',$callback=null) {
+	public function installNodeDependencies($cwd='',$callback=null,$environment=array()) {
 		$cwd = !empty($cwd) ? $cwd : $this->nodeloc;
-		$command = $this->generateRunAsAsteriskCommand('npm-cache -v',$cwd);
+		$command = $this->generateRunAsAsteriskCommand('npm-cache -v',$cwd,$environment);
 		$process = new Process($command);
 		try {
 			$process->mustRun();
@@ -333,10 +333,10 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 				$callback("Found npm-cache v".$process->getOutput());
 			}
 		} catch (ProcessFailedException $e) {
-			$command = $this->generateRunAsAsteriskCommand('npm install -g npm-cache 2>&1',$cwd);
+			$command = $this->generateRunAsAsteriskCommand('npm install -g npm-cache 2>&1',$cwd,$environment);
 			exec($command);
 
-			$command = $this->generateRunAsAsteriskCommand('npm-cache -v',$cwd);
+			$command = $this->generateRunAsAsteriskCommand('npm-cache -v',$cwd,$environment);
 			$process = new Process($command);
 			try {
 				$process->mustRun();
@@ -353,7 +353,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			$callback("Running installation..");
 		}
 		file_put_contents($cwd."/logs/install.log","");
-		$command = $this->generateRunAsAsteriskCommand('npm-cache install 2>&1',$cwd);
+		$command = $this->generateRunAsAsteriskCommand('npm-cache install 2>&1',$cwd,$environment);
 		$handle = popen($command, "r");
 		$log = fopen($cwd."/logs/install.log", "a");
 		while (($buffer = fgets($handle, 4096)) !== false) {
