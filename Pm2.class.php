@@ -94,6 +94,18 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$set['level'] = 2;
 		$set['readonly'] = 1;
 		$this->freepbx->Config->define_conf_setting('PM2PROXY',$set);
+
+		// PM2USECACHE
+		$set['value'] = true;
+		$set['defaultval'] =& $set['value'];
+		$set['options'] = '';
+		$set['name'] = 'Use package caching for NPM';
+		$set['description'] = 'This should only be turned off if you have issues installing node modules from NPM';
+		$set['emptyok'] = 0;
+		$set['level'] = 1;
+		$set['readonly'] = 1;
+		$set['type'] = CONF_TYPE_BOOL;
+		$this->freepbx->Config->define_conf_setting('PM2USECACHE',$set);
 		$this->freepbx->Config->commit_conf_settings();
 
 		outn(_("Installing/Updating Required Libraries. This may take a while..."));
@@ -325,27 +337,29 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 
 	public function installNodeDependencies($cwd='',$callback=null,$environment=array()) {
 		$cwd = !empty($cwd) ? $cwd : $this->nodeloc;
-		$command = $this->generateRunAsAsteriskCommand('npm-cache -v',$cwd,$environment);
-		$process = new Process($command);
-		try {
-			$process->mustRun();
-			if(is_callable($callback)) {
-				$callback("Found npm-cache v".$process->getOutput());
-			}
-		} catch (ProcessFailedException $e) {
-			$command = $this->generateRunAsAsteriskCommand('npm install -g npm-cache 2>&1',$cwd,$environment);
-			exec($command);
-
+		if($this->freepbx->Config->get('PM2USECACHE')) {
 			$command = $this->generateRunAsAsteriskCommand('npm-cache -v',$cwd,$environment);
 			$process = new Process($command);
 			try {
 				$process->mustRun();
 				if(is_callable($callback)) {
-					$callback("Installed npm-cache v".$process->getOutput());
+					$callback("Found npm-cache v".$process->getOutput());
 				}
 			} catch (ProcessFailedException $e) {
-				out($e->getMessage());
-				throw new \Exception("Unable to install npm-cache. This is required");
+				$command = $this->generateRunAsAsteriskCommand('npm install -g npm-cache 2>&1',$cwd,$environment);
+				exec($command);
+
+				$command = $this->generateRunAsAsteriskCommand('npm-cache -v',$cwd,$environment);
+				$process = new Process($command);
+				try {
+					$process->mustRun();
+					if(is_callable($callback)) {
+						$callback("Installed npm-cache v".$process->getOutput());
+					}
+				} catch (ProcessFailedException $e) {
+					out($e->getMessage());
+					throw new \Exception("Unable to install npm-cache. This is required");
+				}
 			}
 		}
 
@@ -353,7 +367,11 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			$callback("Running installation..");
 		}
 		file_put_contents($cwd."/logs/install.log","");
-		$command = $this->generateRunAsAsteriskCommand('npm-cache install 2>&1',$cwd,$environment);
+		if($this->freepbx->Config->get('PM2USECACHE')) {
+			$command = $this->generateRunAsAsteriskCommand('npm-cache install 2>&1',$cwd,$environment);
+		} else {
+			$command = $this->generateRunAsAsteriskCommand('npm install 2>&1',$cwd,$environment);
+		}
 		$handle = popen($command, "r");
 		$log = fopen($cwd."/logs/install.log", "a");
 		while (($buffer = fgets($handle, 4096)) !== false) {
