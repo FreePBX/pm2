@@ -358,7 +358,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 					}
 				} catch (ProcessFailedException $e) {
 					out($e->getMessage());
-					throw new \Exception("Unable to install npm-cache. This is required");
+					$this->freepbx->Config->update('PM2USECACHE',0);
 				}
 			}
 		}
