@@ -101,38 +101,9 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			out("The following messages are ONLY FOR DEBUGGING. Ignore anything that says 'WARN' or is just a warning");
 		}
 
-		$command = $this->generateRunAsAsteriskCommand('npm-cache -v');
-		$process = new Process($command);
-		try {
-			$process->mustRun();
-		} catch (ProcessFailedException $e) {
-			$command = $this->generateRunAsAsteriskCommand('npm install -g npm-cache 2>&1');
-			exec($command);
-		}
-
-		$command = $this->generateRunAsAsteriskCommand('npm-cache -v');
-		$process = new Process($command);
-		try {
-			$process->mustRun();
-		} catch (ProcessFailedException $e) {
-			out($e->getMessage());
-			return false;
-		}
-
-		file_put_contents($this->nodeloc."/logs/install.log","");
-
-		$command = $this->generateRunAsAsteriskCommand('npm-cache install 2>&1');
-		$handle = popen($command, "r");
-		$log = fopen($this->nodeloc."/logs/install.log", "a");
-		while (($buffer = fgets($handle, 4096)) !== false) {
-			fwrite($log,$buffer);
-			if (php_sapi_name() == "cli") {
-				outn($buffer);
-			} else {
-				outn(".");
-			}
-		}
-		fclose($log);
+		$this->installNodeDependencies('',function($data) {
+			outn($data);
+		});
 		out("");
 		out(_("Finished updating libraries!"));
 		if(!file_exists($this->nodeloc."/node_modules/pm2/bin/pm2")) {
@@ -187,17 +158,19 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	 * @method start
 	 * @param  string $name    The name of the application
 	 * @param  string $process The process to run
+	 * @param  string $force   If set to true then force the start
 	 * @return mixed           Output of getStatus
 	 */
-	public function start($name, $process, $environment=array()) {
+	public function start($name, $process, $environment=array(), $force = false) {
 		$name = $this->cleanAppName($name);
 		$pout = $this->getStatus($name);
-		if(!empty($pout) && $pout['pm2_env']['status'] == 'online') {
+		if(!$force && !empty($pout) && $pout['pm2_env']['status'] == 'online') {
 			throw new \Exception("There is already a process by that name running!");
 		}
+		$force = ($force) ? '-f' : '';
 		$astlogdir = $this->freepbx->Config->get("ASTLOGDIR");
 		$cwd = dirname($process);
-		$this->runPM2Command("start ".$process." --name ".escapeshellarg($name)." -e ".escapeshellarg($astlogdir."/".$name."_err.log")." -o ".escapeshellarg($astlogdir."/".$name."_out.log")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'", $cwd, $environment);
+		$this->runPM2Command("start ".$process." ".$force." --name ".escapeshellarg($name)." -e ".escapeshellarg($astlogdir."/".$name."_err.log")." -o ".escapeshellarg($astlogdir."/".$name."_out.log")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'", $cwd, $environment);
 		return $this->getStatus($name);
 	}
 
@@ -348,6 +321,54 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			}
 		}
 		return $home;
+	}
+
+	public function installNodeDependencies($cwd='',$callback=null) {
+		$cwd = !empty($cwd) ? $cwd : $this->nodeloc;
+		$command = $this->generateRunAsAsteriskCommand('npm-cache -v',$cwd);
+		$process = new Process($command);
+		try {
+			$process->mustRun();
+			if(is_callable($callback)) {
+				$callback("Found npm-cache v".$process->getOutput());
+			}
+		} catch (ProcessFailedException $e) {
+			$command = $this->generateRunAsAsteriskCommand('npm install -g npm-cache 2>&1',$cwd);
+			exec($command);
+
+			$command = $this->generateRunAsAsteriskCommand('npm-cache -v',$cwd);
+			$process = new Process($command);
+			try {
+				$process->mustRun();
+				if(is_callable($callback)) {
+					$callback("Installed npm-cache v".$process->getOutput());
+				}
+			} catch (ProcessFailedException $e) {
+				out($e->getMessage());
+				throw new \Exception("Unable to install npm-cache. This is required");
+			}
+		}
+
+		if(is_callable($callback)) {
+			$callback("Running installation..");
+		}
+		file_put_contents($cwd."/logs/install.log","");
+		$command = $this->generateRunAsAsteriskCommand('npm-cache install 2>&1',$cwd);
+		$handle = popen($command, "r");
+		$log = fopen($cwd."/logs/install.log", "a");
+		while (($buffer = fgets($handle, 4096)) !== false) {
+			fwrite($log,$buffer);
+			if (php_sapi_name() == "cli") {
+				if(is_callable($callback)) {
+					$callback($buffer);
+				}
+			} else {
+				if(is_callable($callback)) {
+					$callback(".");
+				}
+			}
+		}
+		fclose($log);
 	}
 
 	/**
