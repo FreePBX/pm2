@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-24 20:09-0400\n"
+"POT-Creation-Date: 2017-06-07 17:27-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "Admin"
 msgstr ""
 
-#: Pm2.class.php:347
+#: Pm2.class.php:320
 #, php-format
 msgid ""
 "Asterisk home dir (%s) doesn't exist, and, ASTSPOOLDIR doesn't exist. "
@@ -36,7 +36,7 @@ msgstr ""
 msgid "Delete Process"
 msgstr ""
 
-#: Pm2.class.php:137
+#: Pm2.class.php:108
 msgid "Finished updating libraries!"
 msgstr ""
 
@@ -131,7 +131,7 @@ msgstr ""
 msgid "The NPM Proxy server address to use"
 msgstr ""
 
-#: Pm2.class.php:140
+#: Pm2.class.php:111
 #, php-format
 msgid "There was an error installing. Please review the install log. (%s)"
 msgstr ""
