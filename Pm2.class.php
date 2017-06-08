@@ -414,7 +414,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$cmds = array(
 			'cd '.(!empty($cwd) ? $cwd : $this->nodeloc),
 			'mkdir -p '.$this->pm2Home,
-			'mkdir -p logs'
+			'mkdir -p '.$cwd.'/logs'
 		);
 
 		$contents = file_get_contents($npmrc);
