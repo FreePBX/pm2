@@ -366,7 +366,13 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		if(is_callable($callback)) {
 			$callback("Running installation..");
 		}
+		if(!file_exists($cwd."/logs")) {
+			mkdir($cwd."/logs",0777,true);
+		}
 		file_put_contents($cwd."/logs/install.log","");
+		$webuser = $this->freepbx->Config->get('AMPASTERISKWEBUSER');
+		$webgroup = $this->freepbx->Config->get('AMPASTERISKWEBGROUP');
+		chown($cwd."/logs/install.log",$webuser);
 		if($this->freepbx->Config->get('PM2USECACHE')) {
 			$command = $this->generateRunAsAsteriskCommand('npm-cache install 2>&1',$cwd,$environment);
 		} else {
