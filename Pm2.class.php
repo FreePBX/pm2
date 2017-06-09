@@ -403,6 +403,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	 * @return string                                The finalized command
 	 */
 	public function generateRunAsAsteriskCommand($command,$cwd='',$environment=array()) {
+		$cwd = !empty($cwd) ? $cwd : $this->nodeloc;
 		$webuser = $this->freepbx->Config->get('AMPASTERISKWEBUSER');
 		$webgroup = $this->freepbx->Config->get('AMPASTERISKWEBGROUP');
 		$webroot = $this->freepbx->Config->get("AMPWEBROOT");
