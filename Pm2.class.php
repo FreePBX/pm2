@@ -463,7 +463,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$final = implode(" && ", $cmds);
 
 		if (posix_getuid() == 0) {
-			$final = "runuser -l ".escapeshellarg($webuser)." -c ".escapeshellarg($final);
+			$final = "runuser ".escapeshellarg($webuser)." -c ".escapeshellarg($final);
 		}
 		return $final;
 	}
