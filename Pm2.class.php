@@ -285,6 +285,9 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	 * @param  boolean       $stream Whether to stream the output or return it
 	 */
 	private function runPM2Command($cmd,$cwd='',$environment=array(),$stream=false) {
+		if(!is_executable($this->nodeloc."/node_modules/pm2/bin/pm2")) {
+			chmod($this->nodeloc."/node_modules/pm2/bin/pm2",0755);
+		}
 		$command = $this->generateRunAsAsteriskCommand($this->nodeloc."/node_modules/pm2/bin/pm2 ".$cmd,$cwd,$environment);
 		$process = new Process($command);
 		if(!$stream) {
