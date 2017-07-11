@@ -285,6 +285,9 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	 * @param  boolean       $stream Whether to stream the output or return it
 	 */
 	private function runPM2Command($cmd,$cwd='',$environment=array(),$stream=false) {
+		if(!file_exists($this->nodeloc."/node_modules/pm2/bin/pm2")){
+			throw new \Exception("pm2 binary does not exist run fwconsole ma install pm2 and try again", 1);
+		}
 		if(!is_executable($this->nodeloc."/node_modules/pm2/bin/pm2")) {
 			chmod($this->nodeloc."/node_modules/pm2/bin/pm2",0755);
 		}
