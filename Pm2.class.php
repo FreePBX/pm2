@@ -298,7 +298,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			return $process->getOutput();
 		} else {
 			$process->setTty(true);
-			$process->setTimeout(60);
+			$process->setTimeout(240);
 			$process->run(function ($type, $buffer) {
 				if (Process::ERR === $type) {
 					echo $buffer;
