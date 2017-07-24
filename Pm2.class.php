@@ -370,7 +370,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		}
 
 		if(is_callable($callback)) {
-			$callback("Running installation..");
+			$callback("Running installation..\n");
 		}
 		if(!file_exists($cwd."/logs")) {
 			mkdir($cwd."/logs",0777,true);
@@ -380,25 +380,37 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$webgroup = $this->freepbx->Config->get('AMPASTERISKWEBGROUP');
 		chown($cwd."/logs/install.log",$webuser);
 		if($this->freepbx->Config->get('PM2USECACHE')) {
-			$command = $this->generateRunAsAsteriskCommand('npm-cache install 2>&1',$cwd,$environment);
+			$command = $this->generateRunAsAsteriskCommand('npm-cache install',$cwd,$environment);
 		} else {
-			$command = $this->generateRunAsAsteriskCommand('npm install 2>&1',$cwd,$environment);
+			$command = $this->generateRunAsAsteriskCommand('npm install',$cwd,$environment);
 		}
-		$handle = popen($command, "r");
 		$log = fopen($cwd."/logs/install.log", "a");
-		while (($buffer = fgets($handle, 4096)) !== false) {
-			fwrite($log,$buffer);
+		$output = function($message) use ($log, $callback) {
+			fwrite($log,$message);
 			if (php_sapi_name() == "cli") {
 				if(is_callable($callback)) {
-					$callback($buffer);
+					$callback($message);
 				}
 			} else {
 				if(is_callable($callback)) {
 					$callback(".");
 				}
 			}
+		};
+		try {
+			$process = new Process($command);
+			$process->setTimeout(3600);
+			$process->setIdleTimeout(600);
+			$process->run(function ($type, $buffer) use ($output) {
+				$output($buffer);
+			});
+		} catch(\Exception $e) {
+			$output($e->getMessage());
+			return false;
 		}
+
 		fclose($log);
+		return $process->isSuccessful();
 	}
 
 	/**
