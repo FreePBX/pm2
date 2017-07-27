@@ -129,8 +129,11 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			chmod($this->nodeloc."/node_modules/pm2/bin/pm2",0755);
 		}
 
+		try {
+			$this->runPM2Command("update");
+		} catch(\Exception $e) {}
+
 		$this->runPM2Command("ping");
-		$this->runPM2Command("update");
 	}
 
 	public function uninstall() {

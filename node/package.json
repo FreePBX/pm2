@@ -6,6 +6,6 @@
   "license": "AGPL3",
   "private": true,
   "dependencies": {
-    "pm2": "^2.4.4"
+    "pm2": "2.6.1"
   }
 }
