@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-18 13:07-0400\n"
+"POT-Creation-Date: 2017-08-29 11:50-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "Admin"
 msgstr ""
 
-#: Pm2.class.php:338
+#: Pm2.class.php:353
 #, php-format
 msgid ""
 "Asterisk home dir (%s) doesn't exist, and, ASTSPOOLDIR doesn't exist. "
@@ -36,7 +36,7 @@ msgstr ""
 msgid "Delete Process"
 msgstr ""
 
-#: Pm2.class.php:120
+#: Pm2.class.php:132
 msgid "Finished updating libraries!"
 msgstr ""
 
@@ -49,12 +49,16 @@ msgstr ""
 msgid "How many lines to stream"
 msgstr ""
 
-#: Pm2.class.php:111
+#: Pm2.class.php:123
 msgid "Installing/Updating Required Libraries. This may take a while..."
 msgstr ""
 
 #: Console/Pm2.class.php:21
 msgid "List Process"
+msgstr ""
+
+#: pm2.i18n.php:18
+msgid "Location of the shell to use for pm2 tasks"
 msgstr ""
 
 #: Console/Pm2.class.php:19
@@ -115,6 +119,10 @@ msgstr ""
 msgid "Save processes, kill PM2 and restore processes"
 msgstr ""
 
+#: pm2.i18n.php:16
+msgid "Shell Executable"
+msgstr ""
+
 #: Console/Pm2.class.php:35
 msgid "Status"
 msgstr ""
@@ -131,7 +139,7 @@ msgstr ""
 msgid "The NPM Proxy server address to use"
 msgstr ""
 
-#: Pm2.class.php:123
+#: Pm2.class.php:135
 #, php-format
 msgid "There was an error installing. Please review the install log. (%s)"
 msgstr ""
@@ -140,13 +148,13 @@ msgstr ""
 msgid "This module manages background processes for your PBX"
 msgstr ""
 
-#: pm2.i18n.php:18
+#: pm2.i18n.php:22
 msgid ""
 "This should only be turned off if you have issues installing node modules "
 "from NPM"
 msgstr ""
 
-#: pm2.i18n.php:22
+#: pm2.i18n.php:26
 msgid ""
 "This should only be turned on if you have issues installing node modules "
 "from NPM"
@@ -156,10 +164,10 @@ msgstr ""
 msgid "Uptime"
 msgstr ""
 
-#: pm2.i18n.php:20
+#: pm2.i18n.php:24
 msgid "Use Proxy Server for NPM"
 msgstr ""
 
-#: pm2.i18n.php:16
+#: pm2.i18n.php:20
 msgid "Use package caching for NPM"
 msgstr ""
