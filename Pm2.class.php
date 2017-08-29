@@ -106,6 +106,18 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$set['readonly'] = 1;
 		$set['type'] = CONF_TYPE_BOOL;
 		$this->freepbx->Config->define_conf_setting('PM2USECACHE',$set);
+
+
+		$set['value'] = '/bin/bash';
+		$set['defaultval'] =& $set['value'];
+		$set['emptyok'] = 0;
+		$set['level'] = 1;
+		$set['readonly'] = 1;
+		$set['name'] = 'Shell Executable';
+		$set['description'] = 'Location of the shell to use for pm2 tasks';
+		$set['type'] = CONF_TYPE_TEXT;
+		$this->freepbx->Config->define_conf_setting('PM2SHELL',$set,true);
+
 		$this->freepbx->Config->commit_conf_settings();
 
 		outn(_("Installing/Updating Required Libraries. This may take a while..."));
@@ -484,7 +496,9 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$final = implode(" && ", $cmds);
 
 		if (posix_getuid() == 0) {
-			$final = "runuser ".escapeshellarg($webuser)." -c ".escapeshellarg($final);
+			$shell = $this->freepbx->Config->get('PM2SHELL');
+			$shell = !empty($shell) ? $shell : '/bin/bash';
+			$final = "runuser ".escapeshellarg($webuser)." -s ".escapeshellarg($shell)." -c ".escapeshellarg($final);
 		}
 		return $final;
 	}
