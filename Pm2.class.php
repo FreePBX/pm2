@@ -367,7 +367,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 					$callback("Found npm-cache v".$process->getOutput());
 				}
 			} catch (ProcessFailedException $e) {
-				$command = $this->generateRunAsAsteriskCommand('npm install -g npm-cache 2>&1',$cwd,$environment);
+				$command = $this->generateRunAsAsteriskCommand('npm install -g npm-cache',$cwd,$environment);
 				exec($command);
 
 				$command = $this->generateRunAsAsteriskCommand('npm-cache -v',$cwd,$environment);
