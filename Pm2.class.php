@@ -493,8 +493,6 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$cmds[] = escapeshellcmd($command);
 		$final = implode(" && ", $cmds);
 
-		print_r($final."\n");
-
 		if (posix_getuid() == 0) {
 			$shell = $this->freepbx->Config->get('PM2SHELL');
 			$shell = !empty($shell) ? $shell : '/bin/bash';
