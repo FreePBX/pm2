@@ -485,13 +485,15 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			'export PM2_HOME='.escapeshellarg($this->pm2Home),
 			'export ASTLOGDIR='.escapeshellarg($astlogdir),
 			'export ASTVARLIBDIR='.escapeshellarg($varlibdir),
-			'export PATH=\'$HOME/.node/bin:$PATH\'',
-			'export NODE_PATH=\'$HOME/.node/lib/node_modules:$NODE_PATH\'',
-			'export MANPATH=\'$HOME/.node/share/man:$MANPATH\'',
+			'export PATH=$HOME/.node/bin:$PATH',
+			'export NODE_PATH=$HOME/.node/lib/node_modules:$NODE_PATH',
+			'export MANPATH=$HOME/.node/share/man:$MANPATH',
 
 		));
 		$cmds[] = escapeshellcmd($command);
 		$final = implode(" && ", $cmds);
+
+		print_r($final."\n");
 
 		if (posix_getuid() == 0) {
 			$shell = $this->freepbx->Config->get('PM2SHELL');
