@@ -473,26 +473,24 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 
 		$this->write_php_ini($npmrc,$ini);
 
-		foreach($environment as $env) {
-			if(is_array($env)) {
-				foreach($env as $k => $v) {
-					$cmds[] = 'export '.escapeshellarg($k).'='.escapeshellarg($k);
-				}
-			} else {
-				$cmds[] = 'export '.escapeshellarg($env);
+		foreach($environment as $k => $v) {
+			if(empty($k) || !is_string($v)) {
+				continue;
 			}
+			$cmds[] = 'export '.escapeshellcmd($k).'='.escapeshellcmd($v);
 		}
 
 		$cmds = array_merge($cmds,array(
-			'export HOME="'.$this->getHomeDir().'"',
-			'export PM2_HOME="'.$this->pm2Home.'"',
-			'export ASTLOGDIR="'.$astlogdir.'"',
-			'export ASTVARLIBDIR="'.$varlibdir.'"',
-			'export PATH="$HOME/.node/bin:$PATH"',
-			'export NODE_PATH="$HOME/.node/lib/node_modules:$NODE_PATH"',
-			'export MANPATH="$HOME/.node/share/man:$MANPATH"'
+			'export HOME='.escapeshellcmd($this->getHomeDir()),
+			'export PM2_HOME='.escapeshellcmd($this->pm2Home),
+			'export ASTLOGDIR='.escapeshellcmd($astlogdir),
+			'export ASTVARLIBDIR='.escapeshellcmd($varlibdir),
+			'export PATH=$HOME/.node/bin:$PATH',
+			'export NODE_PATH=$HOME/.node/lib/node_modules:$NODE_PATH',
+			'export MANPATH=$HOME/.node/share/man:$MANPATH',
+
 		));
-		$cmds[] = $command;
+		$cmds[] = escapeshellcmd($command);
 		$final = implode(" && ", $cmds);
 
 		if (posix_getuid() == 0) {
