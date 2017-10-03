@@ -197,7 +197,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$force = ($force) ? '-f' : '';
 		$astlogdir = $this->freepbx->Config->get("ASTLOGDIR");
 		$cwd = dirname($process);
-		$this->runPM2Command("start ".$process." ".$force." --name ".escapeshellarg($name)." -e ".escapeshellarg($astlogdir."/".$name."_err.log")." -o ".escapeshellarg($astlogdir."/".$name."_out.log")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'", $cwd, $environment);
+		$this->runPM2Command("start ".$process." ".$force." --update-env --name ".escapeshellarg($name)." -e ".escapeshellarg($astlogdir."/".$name."_err.log")." -o ".escapeshellarg($astlogdir."/".$name."_out.log")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'", $cwd, $environment);
 		return $this->getStatus($name);
 	}
 
@@ -226,7 +226,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		if(empty($out)) {
 			throw new \Exception("There is no process by that name");
 		}
-		$this->runPM2Command("restart ".$name);
+		$this->runPM2Command("restart ".$name." --update-env");
 	}
 
 	/**
@@ -367,7 +367,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 					$callback("Found npm-cache v".$process->getOutput());
 				}
 			} catch (ProcessFailedException $e) {
-				$command = $this->generateRunAsAsteriskCommand('npm install -g npm-cache 2>&1',$cwd,$environment);
+				$command = $this->generateRunAsAsteriskCommand('npm install -g npm-cache',$cwd,$environment);
 				exec($command);
 
 				$command = $this->generateRunAsAsteriskCommand('npm-cache -v',$cwd,$environment);
@@ -477,7 +477,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			if(empty($k) || !is_string($v)) {
 				continue;
 			}
-			$cmds[] = 'export '.escapeshellcmd($k).'='.escapeshellcmd($v);
+			$cmds[] = 'export '.escapeshellarg($k).'='.escapeshellarg($v);
 		}
 
 		$cmds = array_merge($cmds,array(
@@ -498,6 +498,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			$shell = !empty($shell) ? $shell : '/bin/bash';
 			$final = "runuser ".escapeshellarg($webuser)." -s ".escapeshellarg($shell)." -c ".escapeshellarg($final);
 		}
+
 		return $final;
 	}
 
