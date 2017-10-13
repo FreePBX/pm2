@@ -185,7 +185,6 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	 * @method start
 	 * @param  string $name    The name of the application
 	 * @param  string $process The process to run
-	 * @param  string $force   If set to true then force the start
 	 * @return mixed           Output of getStatus
 	 */
 	public function start($name, $process, $environment=array(), $force = false) {
@@ -194,10 +193,32 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		if(!$force && !empty($pout) && $pout['pm2_env']['status'] == 'online') {
 			throw new \Exception("There is already a process by that name running!");
 		}
+		try {
+			$this->runPM2Command("delete ".$name);
+		} catch(\Exception $e) {}
+		$processParts = explode(" ",$process,2);
 		$force = ($force) ? '-f' : '';
 		$astlogdir = $this->freepbx->Config->get("ASTLOGDIR");
 		$cwd = dirname($process);
-		$this->runPM2Command("start ".$process." ".$force." --update-env --name ".escapeshellarg($name)." -e ".escapeshellarg($astlogdir."/".$name."_err.log")." -o ".escapeshellarg($astlogdir."/".$name."_out.log")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'", $cwd, $environment);
+		$args = !empty($processParts[1]) ? ' -- '.$processParts[1] : '';
+		$this->runPM2Command("start ".$processParts[0]." ".$force." --update-env --name ".escapeshellarg($name)." -e ".escapeshellarg($astlogdir."/".$name."_err.log")." -o ".escapeshellarg($astlogdir."/".$name."_out.log")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'".$args, $cwd, $environment);
+		return $this->getStatus($name);
+	}
+
+	public function startFromDirectory($name, $process, $directory, $environment=array(), $force = false) {
+		$name = $this->cleanAppName($name);
+		$pout = $this->getStatus($name);
+		if(!$force && !empty($pout) && $pout['pm2_env']['status'] == 'online') {
+			throw new \Exception("There is already a process by that name running!");
+		}
+		try {
+			$this->runPM2Command("delete ".$name);
+		} catch(\Exception $e) {}
+		$processParts = explode(" ",$process,2);
+		$force = ($force) ? '-f' : '';
+		$astlogdir = $this->freepbx->Config->get("ASTLOGDIR");
+		$args = !empty($processParts[1]) ? ' -- '.$processParts[1] : '';
+		$this->runPM2Command("start ".$processParts[0]." ".$force." --update-env --name ".escapeshellarg($name)." -e ".escapeshellarg($astlogdir."/".$name."_err.log")." -o ".escapeshellarg($astlogdir."/".$name."_out.log")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'".$args, $directory, $environment);
 		return $this->getStatus($name);
 	}
 
