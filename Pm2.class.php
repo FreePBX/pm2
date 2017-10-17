@@ -356,7 +356,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		return $home;
 	}
 
-	public function installNodeDependencies($cwd='',$callback=null,$environment=array()) {
+	public function installNodeDependencies($cwd='',$callback=null,$environment=array(),$production=true) {
 		$cwd = !empty($cwd) ? $cwd : $this->nodeloc;
 		if($this->freepbx->Config->get('PM2USECACHE')) {
 			$command = $this->generateRunAsAsteriskCommand('npm-cache -v',$cwd,$environment);
@@ -394,10 +394,11 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$webuser = $this->freepbx->Config->get('AMPASTERISKWEBUSER');
 		$webgroup = $this->freepbx->Config->get('AMPASTERISKWEBGROUP');
 		chown($cwd."/logs/install.log",$webuser);
+		$prod = ($production) ? ' --only=production' : '';
 		if($this->freepbx->Config->get('PM2USECACHE')) {
-			$command = $this->generateRunAsAsteriskCommand('npm-cache install',$cwd,$environment);
+			$command = $this->generateRunAsAsteriskCommand('npm-cache install'.$prod,$cwd,$environment);
 		} else {
-			$command = $this->generateRunAsAsteriskCommand('npm install',$cwd,$environment);
+			$command = $this->generateRunAsAsteriskCommand('npm install'.$prod,$cwd,$environment);
 		}
 		$log = fopen($cwd."/logs/install.log", "a");
 		$output = function($message) use ($log, $callback) {
