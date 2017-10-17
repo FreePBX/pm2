@@ -185,7 +185,6 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	 * @method start
 	 * @param  string $name    The name of the application
 	 * @param  string $process The process to run
-	 * @param  string $force   If set to true then force the start
 	 * @return mixed           Output of getStatus
 	 */
 	public function start($name, $process, $environment=array(), $force = false) {
@@ -194,10 +193,32 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		if(!$force && !empty($pout) && $pout['pm2_env']['status'] == 'online') {
 			throw new \Exception("There is already a process by that name running!");
 		}
+		try {
+			$this->runPM2Command("delete ".$name);
+		} catch(\Exception $e) {}
+		$processParts = explode(" ",$process,2);
 		$force = ($force) ? '-f' : '';
 		$astlogdir = $this->freepbx->Config->get("ASTLOGDIR");
 		$cwd = dirname($process);
-		$this->runPM2Command("start ".$process." ".$force." --name ".escapeshellarg($name)." -e ".escapeshellarg($astlogdir."/".$name."_err.log")." -o ".escapeshellarg($astlogdir."/".$name."_out.log")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'", $cwd, $environment);
+		$args = !empty($processParts[1]) ? ' -- '.$processParts[1] : '';
+		$this->runPM2Command("start ".$processParts[0]." ".$force." --update-env --name ".escapeshellarg($name)." -e ".escapeshellarg($astlogdir."/".$name."_err.log")." -o ".escapeshellarg($astlogdir."/".$name."_out.log")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'".$args, $cwd, $environment);
+		return $this->getStatus($name);
+	}
+
+	public function startFromDirectory($name, $process, $directory, $environment=array(), $force = false) {
+		$name = $this->cleanAppName($name);
+		$pout = $this->getStatus($name);
+		if(!$force && !empty($pout) && $pout['pm2_env']['status'] == 'online') {
+			throw new \Exception("There is already a process by that name running!");
+		}
+		try {
+			$this->runPM2Command("delete ".$name);
+		} catch(\Exception $e) {}
+		$processParts = explode(" ",$process,2);
+		$force = ($force) ? '-f' : '';
+		$astlogdir = $this->freepbx->Config->get("ASTLOGDIR");
+		$args = !empty($processParts[1]) ? ' -- '.$processParts[1] : '';
+		$this->runPM2Command("start ".$processParts[0]." ".$force." --update-env --name ".escapeshellarg($name)." -e ".escapeshellarg($astlogdir."/".$name."_err.log")." -o ".escapeshellarg($astlogdir."/".$name."_out.log")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'".$args, $directory, $environment);
 		return $this->getStatus($name);
 	}
 
@@ -226,7 +247,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		if(empty($out)) {
 			throw new \Exception("There is no process by that name");
 		}
-		$this->runPM2Command("restart ".$name);
+		$this->runPM2Command("restart ".$name." --update-env");
 	}
 
 	/**
@@ -367,7 +388,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 					$callback("Found npm-cache v".$process->getOutput());
 				}
 			} catch (ProcessFailedException $e) {
-				$command = $this->generateRunAsAsteriskCommand('npm install -g npm-cache 2>&1',$cwd,$environment);
+				$command = $this->generateRunAsAsteriskCommand('npm install -g npm-cache',$cwd,$environment);
 				exec($command);
 
 				$command = $this->generateRunAsAsteriskCommand('npm-cache -v',$cwd,$environment);
@@ -474,26 +495,24 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 
 		$this->write_php_ini($npmrc,$ini);
 
-		foreach($environment as $env) {
-			if(is_array($env)) {
-				foreach($env as $k => $v) {
-					$cmds[] = 'export '.escapeshellarg($k).'='.escapeshellarg($k);
-				}
-			} else {
-				$cmds[] = 'export '.escapeshellarg($env);
+		foreach($environment as $k => $v) {
+			if(empty($k) || !is_string($v)) {
+				continue;
 			}
+			$cmds[] = 'export '.escapeshellarg($k).'='.escapeshellarg($v);
 		}
 
 		$cmds = array_merge($cmds,array(
-			'export HOME="'.$this->getHomeDir().'"',
-			'export PM2_HOME="'.$this->pm2Home.'"',
-			'export ASTLOGDIR="'.$astlogdir.'"',
-			'export ASTVARLIBDIR="'.$varlibdir.'"',
-			'export PATH="$HOME/.node/bin:$PATH"',
-			'export NODE_PATH="$HOME/.node/lib/node_modules:$NODE_PATH"',
-			'export MANPATH="$HOME/.node/share/man:$MANPATH"'
+			'export HOME='.escapeshellcmd($this->getHomeDir()),
+			'export PM2_HOME='.escapeshellcmd($this->pm2Home),
+			'export ASTLOGDIR='.escapeshellcmd($astlogdir),
+			'export ASTVARLIBDIR='.escapeshellcmd($varlibdir),
+			'export PATH=$HOME/.node/bin:$PATH',
+			'export NODE_PATH=$HOME/.node/lib/node_modules:$NODE_PATH',
+			'export MANPATH=$HOME/.node/share/man:$MANPATH',
+
 		));
-		$cmds[] = $command;
+		$cmds[] = escapeshellcmd($command);
 		$final = implode(" && ", $cmds);
 
 		if (posix_getuid() == 0) {
@@ -501,6 +520,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			$shell = !empty($shell) ? $shell : '/bin/bash';
 			$final = "runuser ".escapeshellarg($webuser)." -s ".escapeshellarg($shell)." -c ".escapeshellarg($final);
 		}
+
 		return $final;
 	}
 
