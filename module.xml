@@ -2,14 +2,15 @@
 	<rawname>pm2</rawname>
 	<repo>standard</repo>
 	<name>Process Management</name>
-	<version>13.0.4.1</version>
+	<version>13.0.4.2</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>AGPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/agpl-3.0.txt</licenselink>
 	<category>Admin</category>
 	<description>This module manages background processes for your PBX</description>
 	<changelog>
-		*13.0.4.1 Pass production arg to npm install
+		*13.0.4.2* FREEPBX-16439
+		*13.0.4.1* Pass production arg to npm install
 		*13.0.4* Add new function 'startFromDirectory'
 		*13.0.3.23* FREEPBX-15950 fix displaying of messages
 		*13.0.3.22* Remove sending to background npm-cache
