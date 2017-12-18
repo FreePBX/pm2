@@ -141,6 +141,10 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			chmod($this->nodeloc."/node_modules/pm2/bin/pm2",0755);
 		}
 
+		if(file_exists($this->pm2Home."/pm2.log")) {
+			@unlink($this->pm2Home."/pm2.log");
+		}
+
 		try {
 			$this->runPM2Command("update");
 		} catch(\Exception $e) {}
@@ -201,7 +205,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$astlogdir = $this->freepbx->Config->get("ASTLOGDIR");
 		$cwd = dirname($process);
 		$args = !empty($processParts[1]) ? ' -- '.$processParts[1] : '';
-		$this->runPM2Command("start ".$processParts[0]." ".$force." --update-env --name ".escapeshellarg($name)." -e ".escapeshellarg($astlogdir."/".$name."_err.log")." -o ".escapeshellarg($astlogdir."/".$name."_out.log")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'".$args, $cwd, $environment);
+		$this->runPM2Command("start ".$processParts[0]." ".$force." --update-env --name ".escapeshellarg($name)." -e ".escapeshellarg($astlogdir."/".$name."_err.log")." -o ".escapeshellarg($astlogdir."/".$name."_out.log")." --log ".escapeshellarg("/dev/null")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'".$args, $cwd, $environment);
 		return $this->getStatus($name);
 	}
 
@@ -218,7 +222,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$force = ($force) ? '-f' : '';
 		$astlogdir = $this->freepbx->Config->get("ASTLOGDIR");
 		$args = !empty($processParts[1]) ? ' -- '.$processParts[1] : '';
-		$this->runPM2Command("start ".$processParts[0]." ".$force." --update-env --name ".escapeshellarg($name)." -e ".escapeshellarg($astlogdir."/".$name."_err.log")." -o ".escapeshellarg($astlogdir."/".$name."_out.log")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'".$args, $directory, $environment);
+		$this->runPM2Command("start ".$processParts[0]." ".$force." --update-env --name ".escapeshellarg($name)." -e ".escapeshellarg($astlogdir."/".$name."_err.log")." -o ".escapeshellarg($astlogdir."/".$name."_out.log")." --log ".escapeshellarg("/dev/null")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'".$args, $directory, $environment);
 		return $this->getStatus($name);
 	}
 
