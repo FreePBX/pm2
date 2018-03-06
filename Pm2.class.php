@@ -290,7 +290,15 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	}
 
 	public function reloadLogs() {
-		$this->runPM2Command("reloadLogs");
+		try {
+			$this->runPM2Command("reloadLogs",'',array(),false,5,5);
+		} catch(\Exception $e) {
+			//https://github.com/Unitech/pm2/issues/3521
+			if(get_class($e) == "Symfony\Component\Process\Exception\ProcessTimedOutException") {
+				return;
+			}
+			throw $e;
+		}
 	}
 
 	/**
@@ -324,7 +332,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	 * @param  string        $cmd    The command to run
 	 * @param  boolean       $stream Whether to stream the output or return it
 	 */
-	private function runPM2Command($cmd,$cwd='',$environment=array(),$stream=false) {
+	private function runPM2Command($cmd,$cwd='',$environment=array(),$stream=false,$timeout=240,$idleTimeout=null) {
 		if(!file_exists($this->nodeloc."/node_modules/pm2/bin/pm2")){
 			throw new \Exception("pm2 binary does not exist run fwconsole ma install pm2 and try again", 1);
 		}
@@ -333,12 +341,15 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		}
 		$command = $this->generateRunAsAsteriskCommand($this->nodeloc."/node_modules/pm2/bin/pm2 ".$cmd,$cwd,$environment);
 		$process = new Process($command);
+		$process->setIdleTimeout($timeout);
+		if(!empty($idleTimeout)) {
+			$process->setTimeout($idleTimeout);
+		}
 		if(!$stream) {
 			$process->mustRun();
 			return $process->getOutput();
 		} else {
 			$process->setTty(true);
-			$process->setTimeout(240);
 			$process->run(function ($type, $buffer) {
 				if (Process::ERR === $type) {
 					echo $buffer;
