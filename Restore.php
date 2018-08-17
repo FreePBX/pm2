@@ -17,4 +17,19 @@ class Restore Extends Base\RestoreBase{
       $this->FreePBX->Config->set($setting,$value);
     }
   }
+  public function processLegacy($pdodbconn, $data, $tablelist, $unknowntables, $tmpdir){
+    $settings = [
+      'PM2USEPROXY' => false,
+      'NODEJSBINDADDRESS' => 'http://mirror.freepbx.org:6767/',
+      'PM2USECACHE' => true,
+      'PM2SHELL' => '/bin/bash',
+    ];
+    $configs = $this->getAMPConf($pdo);
+    foreach ($configs as $setting => $value) {
+      if (!isset($settings[$setting])) {
+        continue;
+      }
+      $this->FreePBX->Config->set($setting, $settings[$setting]);
+    }
+  }
 }
