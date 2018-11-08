@@ -24,7 +24,7 @@ class Restore Extends Base\RestoreBase{
       'PM2USECACHE' => true,
       'PM2SHELL' => '/bin/bash',
     ];
-    $configs = $this->getAMPConf($pdo);
+    $configs = $this->getAMPConf($pdodbconn);
     foreach ($configs as $setting => $value) {
       if (!isset($settings[$setting])) {
         continue;
