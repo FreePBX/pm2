@@ -71,6 +71,18 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$set['module'] = 'pm2';
 		$set['category'] = 'Process Management';
 
+		// PM2DISABLELOG
+		$set['value'] = false;
+		$set['defaultval'] =& $set['value'];
+		$set['options'] = '';
+		$set['name'] = 'Disable PM2 Logging';
+		$set['description'] = 'Whether or not to invoke the PM2 log facility.';
+		$set['emptyok'] = 0;
+		$set['level'] = 1;
+		$set['readonly'] = 1;
+		$set['type'] = CONF_TYPE_BOOL;
+		$this->freepbx->Config->define_conf_setting('PM2DISABLELOG',$set);
+
 		// PM2USEPROXY
 		$set['value'] = false;
 		$set['defaultval'] =& $set['value'];
@@ -132,7 +144,11 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		out(_("Finished updating libraries!"));
 		if(!file_exists($this->nodeloc."/node_modules/pm2/bin/pm2")) {
 			out("");
-			out(sprintf(_("There was an error installing. Please review the install log. (%s)"),$this->nodeloc."/logs/install.log"));
+			if($this->freepbx->Config->get("PM2DISABLELOG")) {
+				out(_("There was an error installing and PM2 Logging is disabled"));
+			} else {
+				out(sprintf(_("There was an error installing. Please review the install log. (%s)"),$this->nodeloc."/logs/install.log"));
+			}
 			return false;
 		}
 
@@ -203,9 +219,12 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$processParts = explode(" ",$process,2);
 		$force = ($force) ? '-f' : '';
 		$astlogdir = $this->freepbx->Config->get("ASTLOGDIR");
+		$PM2DISABLELOG = $this->freepbx->Config->get("PM2DISABLELOG");
+		$errorLog = $PM2DISABLELOG ? '/dev/null' : $astlogdir."/".$name."_err.log";
+		$outLog = $PM2DISABLELOG ? '/dev/null' : $astlogdir."/".$name."_out.log";
 		$cwd = dirname($process);
 		$args = !empty($processParts[1]) ? ' -- '.$processParts[1] : '';
-		$this->runPM2Command("start ".$processParts[0]." ".$force." --update-env --name ".escapeshellarg($name)." -e ".escapeshellarg($astlogdir."/".$name."_err.log")." -o ".escapeshellarg($astlogdir."/".$name."_out.log")." --log ".escapeshellarg("/dev/null")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'".$args, $cwd, $environment);
+		$this->runPM2Command("start ".$processParts[0]." ".$force." --update-env --name ".escapeshellarg($name)." -e ".escapeshellarg($errorLog)." -o ".escapeshellarg($outLog)." --log ".escapeshellarg("/dev/null")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'".$args, $cwd, $environment);
 		return $this->getStatus($name);
 	}
 
@@ -221,8 +240,11 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$processParts = explode(" ",$process,2);
 		$force = ($force) ? '-f' : '';
 		$astlogdir = $this->freepbx->Config->get("ASTLOGDIR");
+		$PM2DISABLELOG = $this->freepbx->Config->get("PM2DISABLELOG");
+		$errorLog = $PM2DISABLELOG ? '/dev/null' : $astlogdir."/".$name."_err.log";
+		$outLog = $PM2DISABLELOG ? '/dev/null' : $astlogdir."/".$name."_out.log";
 		$args = !empty($processParts[1]) ? ' -- '.$processParts[1] : '';
-		$this->runPM2Command("start ".$processParts[0]." ".$force." --update-env --name ".escapeshellarg($name)." -e ".escapeshellarg($astlogdir."/".$name."_err.log")." -o ".escapeshellarg($astlogdir."/".$name."_out.log")." --log ".escapeshellarg("/dev/null")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'".$args, $directory, $environment);
+		$this->runPM2Command("start ".$processParts[0]." ".$force." --update-env --name ".escapeshellarg($name)." -e ".escapeshellarg($errorLog)." -o ".escapeshellarg($outLog)." --log ".escapeshellarg("/dev/null")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'".$args, $directory, $environment);
 		return $this->getStatus($name);
 	}
 
@@ -423,32 +445,41 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		if(is_callable($callback)) {
 			$callback("Running installation..\n");
 		}
-		if(!file_exists($cwd."/logs")) {
+
+		$PM2DISABLELOG = $this->freepbx->Config->get("PM2DISABLELOG");
+
+		if(!$PM2DISABLELOG && !file_exists($cwd."/logs")) {
 			mkdir($cwd."/logs",0777,true);
 		}
-		file_put_contents($cwd."/logs/install.log","");
-		$webuser = $this->freepbx->Config->get('AMPASTERISKWEBUSER');
-		$webgroup = $this->freepbx->Config->get('AMPASTERISKWEBGROUP');
-		chown($cwd."/logs/install.log",$webuser);
+
+		if(!$PM2DISABLELOG) {
+			file_put_contents($cwd."/logs/install.log","");
+			$webuser = $this->freepbx->Config->get('AMPASTERISKWEBUSER');
+			$webgroup = $this->freepbx->Config->get('AMPASTERISKWEBGROUP');
+			chown($cwd."/logs/install.log",$webuser);
+		}
+
 		$prod = ($production) ? ' --only=production' : '';
 		if($this->freepbx->Config->get('PM2USECACHE')) {
 			$command = $this->generateRunAsAsteriskCommand('npm-cache install'.$prod,$cwd,$environment);
 		} else {
 			$command = $this->generateRunAsAsteriskCommand('npm install'.$prod,$cwd,$environment);
 		}
-		$log = fopen($cwd."/logs/install.log", "a");
-		$output = function($message) use ($log, $callback) {
-			fwrite($log,$message);
-			if (php_sapi_name() == "cli") {
-				if(is_callable($callback)) {
-					$callback($message);
+		if(!$PM2DISABLELOG) {
+			$log = fopen($cwd."/logs/install.log", "a");
+			$output = function($message) use ($log, $callback) {
+				fwrite($log,$message);
+				if (php_sapi_name() == "cli") {
+					if(is_callable($callback)) {
+						$callback($message);
+					}
+				} else {
+					if(is_callable($callback)) {
+						$callback(".");
+					}
 				}
-			} else {
-				if(is_callable($callback)) {
-					$callback(".");
-				}
-			}
-		};
+			};
+		}
 		try {
 			$process = new Process($command);
 			$process->setTimeout(3600);
@@ -460,8 +491,9 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			$output($e->getMessage());
 			return false;
 		}
-
-		fclose($log);
+		if(!$PM2DISABLELOG) {
+			fclose($log);
+		}
 		return $process->isSuccessful();
 	}
 
@@ -490,9 +522,12 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 
 		$cmds = array(
 			'cd '.$cwd,
-			'mkdir -p '.$this->pm2Home,
-			'mkdir -p '.$cwd.'/logs'
+			'mkdir -p '.$this->pm2Home
 		);
+
+		if(!$PM2DISABLELOG) {
+			$cmds[] = 'mkdir -p '.$cwd.'/logs';
+		}
 
 		$contents = file_get_contents($npmrc);
 		$contents .= "\n";
