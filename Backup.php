@@ -9,6 +9,7 @@ class Backup Extends Base\BackupBase{
       'NODEJSBINDADDRESS' => 'http://mirror.freepbx.org:6767/',
       'PM2USECACHE' => true,
       'PM2SHELL' => '/bin/bash',
+      'PM2DISABLELOG' => false
     ];
     foreach($advancedSettings as $setting => $default){
       $ret = $this->FreePBX->Config->get($setting);

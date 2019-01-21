@@ -9,6 +9,7 @@ class Restore Extends Base\RestoreBase{
       'NODEJSBINDADDRESS' => 'http://mirror.freepbx.org:6767/',
       'PM2USECACHE' => true,
       'PM2SHELL' => '/bin/bash',
+      'PM2DISABLELOG' => false
     ];
     foreach($configs as $setting => $value){
       if(!isset($advancedSettings[$setting])){
@@ -23,6 +24,7 @@ class Restore Extends Base\RestoreBase{
       'NODEJSBINDADDRESS' => 'http://mirror.freepbx.org:6767/',
       'PM2USECACHE' => true,
       'PM2SHELL' => '/bin/bash',
+      'PM2DISABLELOG' => false
     ];
     $configs = $this->getAMPConf($pdodbconn);
     foreach ($configs as $setting => $value) {

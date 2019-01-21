@@ -2,13 +2,14 @@
 	<rawname>pm2</rawname>
 	<repo>standard</repo>
 	<name>Process Management</name>
-	<version>15.0.2</version>
+	<version>15.0.3</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>AGPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/agpl-3.0.txt</licenselink>
 	<category>Admin</category>
 	<description>This module manages background processes for your PBX</description>
 	<changelog>
+		*15.0.3* FREEPBX-18898 ablity to disable logging
 		*15.0.2* Fixing problems in Backup 15 
 		*15.0.1* Impliment Backup
 	</changelog>
