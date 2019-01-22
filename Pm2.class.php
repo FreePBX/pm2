@@ -525,6 +525,8 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			'mkdir -p '.$this->pm2Home
 		);
 
+		$PM2DISABLELOG = $this->freepbx->Config->get("PM2DISABLELOG");
+
 		if(!$PM2DISABLELOG) {
 			$cmds[] = 'mkdir -p '.$cwd.'/logs';
 		}
