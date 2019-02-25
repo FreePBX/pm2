@@ -467,19 +467,21 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		}
 		if(!$PM2DISABLELOG) {
 			$log = fopen($cwd."/logs/install.log", "a");
-			$output = function($message) use ($log, $callback) {
-				fwrite($log,$message);
-				if (php_sapi_name() == "cli") {
-					if(is_callable($callback)) {
-						$callback($message);
-					}
-				} else {
-					if(is_callable($callback)) {
-						$callback(".");
-					}
-				}
-			};
 		}
+		$output = function($message) use ($PM2DISABLELOG, $log, $callback) {
+			if(!$PM2DISABLELOG) {
+				fwrite($log,$message);
+			}
+			if (php_sapi_name() == "cli") {
+				if(is_callable($callback)) {
+					$callback($message);
+				}
+			} else {
+				if(is_callable($callback)) {
+					$callback(".");
+				}
+			}
+		};
 		try {
 			$process = new Process($command);
 			$process->setTimeout(3600);
