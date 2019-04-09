@@ -6,6 +6,6 @@
   "license": "AGPL3",
   "private": true,
   "dependencies": {
-    "pm2": "http://mirror1.freepbx.org/npm/pm2-2.10.5.tgz"
+    "pm2": "http://mirror1.freepbx.org/npm/pm2-2.10.6.tgz"
   }
 }
