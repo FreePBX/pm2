@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-25 11:40-0500\n"
+"POT-Creation-Date: 2019-04-08 22:08-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,10 +37,6 @@ msgstr ""
 msgid "Delete Process"
 msgstr ""
 
-#: pm2.i18n.php:10
-msgid "Disable PM2 Logging"
-msgstr ""
-
 #: Pm2.class.php:144
 msgid "Finished updating libraries!"
 msgstr ""
@@ -62,7 +58,7 @@ msgstr ""
 msgid "List Process"
 msgstr ""
 
-#: pm2.i18n.php:22
+#: pm2.i18n.php:18
 msgid "Location of the shell to use for pm2 tasks"
 msgstr ""
 
@@ -74,7 +70,7 @@ msgstr ""
 msgid "Mem"
 msgstr ""
 
-#: pm2.i18n.php:16
+#: pm2.i18n.php:10
 msgid "NPM Proxy Server Address"
 msgstr ""
 
@@ -124,7 +120,7 @@ msgstr ""
 msgid "Save processes, kill PM2 and restore processes"
 msgstr ""
 
-#: pm2.i18n.php:20
+#: pm2.i18n.php:16
 msgid "Shell Executable"
 msgstr ""
 
@@ -140,7 +136,7 @@ msgstr ""
 msgid "Stream Logs from Process"
 msgstr ""
 
-#: pm2.i18n.php:18
+#: pm2.i18n.php:14
 msgid "The NPM Proxy server address to use"
 msgstr ""
 
@@ -157,13 +153,13 @@ msgstr ""
 msgid "This module manages background processes for your PBX"
 msgstr ""
 
-#: pm2.i18n.php:26
+#: pm2.i18n.php:22
 msgid ""
 "This should only be turned off if you have issues installing node modules "
 "from NPM"
 msgstr ""
 
-#: pm2.i18n.php:30
+#: pm2.i18n.php:26
 msgid ""
 "This should only be turned on if you have issues installing node modules "
 "from NPM"
@@ -173,14 +169,10 @@ msgstr ""
 msgid "Uptime"
 msgstr ""
 
-#: pm2.i18n.php:28
+#: pm2.i18n.php:24
 msgid "Use Proxy Server for NPM"
 msgstr ""
 
-#: pm2.i18n.php:24
+#: pm2.i18n.php:20
 msgid "Use package caching for NPM"
-msgstr ""
-
-#: pm2.i18n.php:14
-msgid "Whether or not to invoke the PM2 log facility."
 msgstr ""
