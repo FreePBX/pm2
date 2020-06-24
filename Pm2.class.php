@@ -365,8 +365,6 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$process = new Process($command);
 		$process->setIdleTimeout($timeout);
 		if(!empty($idleTimeout)) {
-			// https://symfony.com/doc/current/components/process.html#process-idle-timeout
-			$process->setIdleTimeout(60); 	
 			$process->setTimeout($idleTimeout);
 		}
 		if(!$stream) {
