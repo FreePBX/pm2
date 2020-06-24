@@ -3,13 +3,13 @@
 # For licensing information, please see the file named LICENSE located in the module directory
 #
 # FreePBX language template for pm2
-# Copyright (C) 2008-2019 Sangoma Technologies, Inc.
+# Copyright (C) 2008-2020 Sangoma Technologies, Inc.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-09 13:00-0400\n"
+"POT-Creation-Date: 2020-06-24 12:09-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -36,6 +36,10 @@ msgstr ""
 msgid "Delete Process"
 msgstr ""
 
+#: pm2.i18n.php:10
+msgid "Disable PM2 Logging"
+msgstr ""
+
 #: Pm2.class.php:144
 msgid "Finished updating libraries!"
 msgstr ""
@@ -57,7 +61,7 @@ msgstr ""
 msgid "List Process"
 msgstr ""
 
-#: pm2.i18n.php:18
+#: pm2.i18n.php:22
 msgid "Location of the shell to use for pm2 tasks"
 msgstr ""
 
@@ -69,7 +73,7 @@ msgstr ""
 msgid "Mem"
 msgstr ""
 
-#: pm2.i18n.php:10
+#: pm2.i18n.php:16
 msgid "NPM Proxy Server Address"
 msgstr ""
 
@@ -119,7 +123,7 @@ msgstr ""
 msgid "Save processes, kill PM2 and restore processes"
 msgstr ""
 
-#: pm2.i18n.php:16
+#: pm2.i18n.php:20
 msgid "Shell Executable"
 msgstr ""
 
@@ -135,7 +139,7 @@ msgstr ""
 msgid "Stream Logs from Process"
 msgstr ""
 
-#: pm2.i18n.php:14
+#: pm2.i18n.php:18
 msgid "The NPM Proxy server address to use"
 msgstr ""
 
@@ -152,13 +156,13 @@ msgstr ""
 msgid "This module manages background processes for your PBX"
 msgstr ""
 
-#: pm2.i18n.php:22
+#: pm2.i18n.php:26
 msgid ""
 "This should only be turned off if you have issues installing node modules "
 "from NPM"
 msgstr ""
 
-#: pm2.i18n.php:26
+#: pm2.i18n.php:30
 msgid ""
 "This should only be turned on if you have issues installing node modules "
 "from NPM"
@@ -168,10 +172,14 @@ msgstr ""
 msgid "Uptime"
 msgstr ""
 
-#: pm2.i18n.php:24
+#: pm2.i18n.php:28
 msgid "Use Proxy Server for NPM"
 msgstr ""
 
-#: pm2.i18n.php:20
+#: pm2.i18n.php:24
 msgid "Use package caching for NPM"
+msgstr ""
+
+#: pm2.i18n.php:14
+msgid "Whether or not to invoke the PM2 log facility."
 msgstr ""
