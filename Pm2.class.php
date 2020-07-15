@@ -9,8 +9,8 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 use Symfony\Component\Console\Helper\ProgressBar;
 class Pm2 extends \FreePBX_Helpers implements \BMO {
-	private $nodever = "0.12.18";
-	private $npmver = "2.15.11";
+	private $nodever = "8.10.0";
+	private $npmver = "5.6.0";
 	private $pm2Home = "/tmp";
 	private $nodeloc = "/tmp";
 
@@ -46,6 +46,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			return false;
 		}
 
+		$webuser = $this->freepbx->Config->get('AMPASTERISKWEBUSER');
 		$webgroup = $this->freepbx->Config->get('AMPASTERISKWEBGROUP');
 
 		$data = posix_getgrgid(filegroup($this->getHomeDir()));
