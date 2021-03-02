@@ -13,6 +13,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	private $npmver = "2.15.11";
 	private $pm2Home = "/tmp";
 	private $nodeloc = "/tmp";
+	private static $pm2 = false;
 
 	public function __construct($freepbx = null) {
 		$this->astman = $freepbx->astman;
@@ -20,6 +21,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$this->freepbx = $freepbx;
 		$this->pm2Home = $this->getHomeDir() . "/.pm2";
 		$this->nodeloc = __DIR__."/node";
+		$this->pm2Apps = new \FreePBX\modules\pm2\Pm2Apps();
 	}
 
 	public function install() {
@@ -162,10 +164,10 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		}
 
 		try {
-			$this->runPM2Command("update");
+			$this->pm2Apps->runPM2Command("update");
 		} catch(\Exception $e) {}
 
-		$this->runPM2Command("ping");
+		$this->pm2Apps->runPM2Command("ping");
 	}
 
 	public function uninstall() {
@@ -214,7 +216,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			throw new \Exception("There is already a process by that name running!");
 		}
 		try {
-			$this->runPM2Command("delete ".$name);
+			$this->pm2Apps->runPM2Command("delete ".$name);
 		} catch(\Exception $e) {}
 		$processParts = explode(" ",$process,2);
 		$force = ($force) ? '-f' : '';
@@ -224,7 +226,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$outLog = $PM2DISABLELOG ? '/dev/null' : $astlogdir."/".$name."_out.log";
 		$cwd = dirname($process);
 		$args = !empty($processParts[1]) ? ' -- '.$processParts[1] : '';
-		$this->runPM2Command("start ".$processParts[0]." ".$force." --update-env --name ".escapeshellarg($name)." -e ".escapeshellarg($errorLog)." -o ".escapeshellarg($outLog)." --log ".escapeshellarg("/dev/null")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'".$args, $cwd, $environment);
+		$this->pm2Apps->runPM2Command("start ".$processParts[0]." ".$force." --update-env --name ".escapeshellarg($name)." -e ".escapeshellarg($errorLog)." -o ".escapeshellarg($outLog)." --log ".escapeshellarg("/dev/null")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'".$args, $cwd, $environment);
 		return $this->getStatus($name);
 	}
 
@@ -235,7 +237,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			throw new \Exception("There is already a process by that name running!");
 		}
 		try {
-			$this->runPM2Command("delete ".$name);
+			$this->pm2Apps->runPM2Command("delete ".$name);
 		} catch(\Exception $e) {}
 		$processParts = explode(" ",$process,2);
 		$force = ($force) ? '-f' : '';
@@ -244,7 +246,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$errorLog = $PM2DISABLELOG ? '/dev/null' : $astlogdir."/".$name."_err.log";
 		$outLog = $PM2DISABLELOG ? '/dev/null' : $astlogdir."/".$name."_out.log";
 		$args = !empty($processParts[1]) ? ' -- '.$processParts[1] : '';
-		$this->runPM2Command("start ".$processParts[0]." ".$force." --update-env --name ".escapeshellarg($name)." -e ".escapeshellarg($errorLog)." -o ".escapeshellarg($outLog)." --log ".escapeshellarg("/dev/null")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'".$args, $directory, $environment);
+		$this->pm2Apps->runPM2Command("start ".$processParts[0]." ".$force." --update-env --name ".escapeshellarg($name)." -e ".escapeshellarg($errorLog)." -o ".escapeshellarg($outLog)." --log ".escapeshellarg("/dev/null")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'".$args, $directory, $environment);
 		return $this->getStatus($name);
 	}
 
@@ -259,7 +261,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		if(empty($out)) {
 			throw new \Exception("There is no process by that name");
 		}
-		$this->runPM2Command("stop ".$name);
+		$this->pm2Apps->runPM2Command("stop ".$name);
 	}
 
 	/**
@@ -273,7 +275,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		if(empty($out)) {
 			throw new \Exception("There is no process by that name");
 		}
-		$this->runPM2Command("restart ".$name." --update-env");
+		$this->pm2Apps->runPM2Command("restart ".$name." --update-env");
 	}
 
 	/**
@@ -287,7 +289,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		if(empty($out)) {
 			throw new \Exception("There is no process by that name");
 		}
-		$this->runPM2Command("delete ".$name);
+		$this->pm2Apps->runPM2Command("delete ".$name);
 	}
 
 	/**
@@ -295,7 +297,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	 * @method update
 	 */
 	public function update() {
-		$this->runPM2Command("update",'',array(),true);
+		$this->pm2Apps->runPM2Command("update",'',array(),true);
 	}
 
 	/**
@@ -308,12 +310,12 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		if(empty($out)) {
 			throw new \Exception("There is no process by that name");
 		}
-		$this->runPM2Command("reset ".$name);
+		$this->pm2Apps->runPM2Command("reset ".$name);
 	}
 
 	public function reloadLogs() {
 		try {
-			$this->runPM2Command("reloadLogs",'',array(),false,5,5);
+			$this->pm2Apps->runPM2Command("reloadLogs",'',array(),false,5,5);
 		} catch(\Exception $e) {
 			//https://github.com/Unitech/pm2/issues/3521
 			if(get_class($e) == "Symfony\Component\Process\Exception\ProcessTimedOutException") {
@@ -329,57 +331,23 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	 * @return array        Array of processes
 	 */
 	public function listProcesses() {
-		$output = $this->runPM2Command("jlist");
+		$output = $this->pm2Apps->runPM2Command("jlist");
 		$processes = json_decode($output,true);
 		//check for errors because of this:
 		// [PM2] Spawning PM2 daemon with pm2_home=/home/asterisk/.pm2
 		// [PM2] PM2 Successfully daemonized
 		if(json_last_error() !== JSON_ERROR_NONE) {
-			$output = $this->runPM2Command("jlist");
+			$output = $this->pm2Apps->runPM2Command("jlist");
 			$processes = json_decode($output,true);
 		}
 		$processes = (!empty($processes) && is_array($processes)) ? $processes : array();
 		$final = array();
 		foreach($processes as $process) {
-			$process['pm2_env']['created_at_human_diff'] = ($process['pm2_env']['status'] == 'online') ? $this->get_date_diff(time(),(int)round($process['pm2_env']['created_at']/1000)) : 0;
-			$process['monit']['human_memory'] = $this->human_filesize($process['monit']['memory']);
+			$process['pm2_env']['created_at_human_diff'] = ($process['pm2_env']['status'] == 'online') ? $this->pm2Apps->get_date_diff(time(),(int)round($process['pm2_env']['created_at']/1000)) : 0;
+			$process['monit']['human_memory'] = $this->pm2Apps->human_filesize($process['monit']['memory']);
 			$final[] = $process;
 		}
 		return $final;
-	}
-
-	/**
-	 * Run a command against PM2
-	 * @method runPM2Command
-	 * @param  string        $cmd    The command to run
-	 * @param  boolean       $stream Whether to stream the output or return it
-	 */
-	private function runPM2Command($cmd,$cwd='',$environment=array(),$stream=false,$timeout=240,$idleTimeout=null) {
-		if(!file_exists($this->nodeloc."/node_modules/pm2/bin/pm2")){
-			throw new \Exception("pm2 binary does not exist run fwconsole ma install pm2 and try again", 1);
-		}
-		if(!is_executable($this->nodeloc."/node_modules/pm2/bin/pm2")) {
-			chmod($this->nodeloc."/node_modules/pm2/bin/pm2",0755);
-		}
-		$command = $this->generateRunAsAsteriskCommand($this->nodeloc."/node_modules/pm2/bin/pm2 ".$cmd,$cwd,$environment);
-		$process = new Process($command);
-		$process->setIdleTimeout($timeout);
-		if(!empty($idleTimeout)) {
-			$process->setTimeout($idleTimeout);
-		}
-		if(!$stream) {
-			$process->mustRun();
-			return $process->getOutput();
-		} else {
-			$process->setTty(true);
-			$process->run(function ($type, $buffer) {
-				if (Process::ERR === $type) {
-					echo $buffer;
-				} else {
-					echo $buffer;
-				}
-			});
-		}
 	}
 
 	public function chownFreepbx() {
@@ -595,82 +563,6 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		return $name;
 	}
 
-	/**
-	 * Get human readable time difference between 2 dates
-	 *
-	 * Return difference between 2 dates in year, month, hour, minute or second
-	 * The $precision caps the number of time units used: for instance if
-	 * $time1 - $time2 = 3 days, 4 hours, 12 minutes, 5 seconds
-	 * - with precision = 1 : 3 days
-	 * - with precision = 2 : 3 days, 4 hours
-	 * - with precision = 3 : 3 days, 4 hours, 12 minutes
-	 *
-	 * From: http://www.if-not-true-then-false.com/2010/php-calculate-real-differences-between-two-dates-or-timestamps/
-	 *
-	 * @param mixed $time1 a time (string or timestamp)
-	 * @param mixed $time2 a time (string or timestamp)
-	 * @param integer $precision Optional precision
-	 * @return string time difference
-	 */
-	private function get_date_diff( $time1, $time2, $precision = 2 ) {
-		// If not numeric then convert timestamps
-		if( !is_int( $time1 ) ) {
-			$time1 = strtotime( $time1 );
-		}
-		if( !is_int( $time2 ) ) {
-			$time2 = strtotime( $time2 );
-		}
-		// If time1 > time2 then swap the 2 values
-		if( $time1 > $time2 ) {
-			list( $time1, $time2 ) = array( $time2, $time1 );
-		}
-		// Set up intervals and diffs arrays
-		$intervals = array( 'year', 'month', 'day', 'hour', 'minute', 'second' );
-		$diffs = array();
-		foreach( $intervals as $interval ) {
-			// Create temp time from time1 and interval
-			$ttime = strtotime( '+1 ' . $interval, $time1 );
-			// Set initial values
-			$add = 1;
-			$looped = 0;
-			// Loop until temp time is smaller than time2
-			while ( $time2 >= $ttime ) {
-				// Create new temp time from time1 and interval
-				$add++;
-				$ttime = strtotime( "+" . $add . " " . $interval, $time1 );
-				$looped++;
-			}
-			$time1 = strtotime( "+" . $looped . " " . $interval, $time1 );
-			$diffs[ $interval ] = $looped;
-		}
-		$count = 0;
-		$times = array();
-		foreach( $diffs as $interval => $value ) {
-			// Break if we have needed precission
-			if( $count >= $precision ) {
-				break;
-			}
-			// Add value and interval if value is bigger than 0
-			if( $value > 0 ) {
-				if( $value != 1 ){
-					$interval .= "s";
-				}
-				// Add value and interval to times array
-				$times[] = $value . " " . $interval;
-				$count++;
-			}
-		}
-		// Return string with times
-		return implode( ", ", $times );
-	}
-
-	private function human_filesize($bytes, $dec = 2) {
-		$size   = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
-		$factor = floor((strlen($bytes) - 1) / 3);
-
-		return sprintf("%.{$dec}f", $bytes / pow(1024, $factor)) . @$size[$factor];
-	}
-
 	function write_php_ini($file, $array) {
 		$res = array();
 		foreach($array as $key => $val) {
@@ -704,5 +596,31 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			}
 			fclose($fp);
 		}
+	}
+
+	/**
+	 * getPm2AppsObj
+	 *
+	 * @param  mixed $freepbx
+	 * @return void
+	 */
+	public function getPm2AppsObj() {
+		if (!self::$pm2) {
+			if (!class_exists('FreePBX\\modules\\pm2\Pm2Apps')) {
+				include_once $this->freepbx->Config->get_conf_setting('AMPWEBROOT')."/admin/modules/pm2/Pm2Apps.php";
+			}
+			self::$pm2 = new \FreePBX\modules\pm2\Pm2Apps();
+		}
+		return self::$pm2;
+	}
+			
+	/**
+	 * setPm2Obj
+	 *
+	 * @param  mixed $obj
+	 * @return void
+	 */
+	public function setPm2AppsObj($obj){
+		return self::$pm2 = $obj; 
 	}
 }
