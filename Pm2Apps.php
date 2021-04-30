@@ -10,9 +10,24 @@ use Symfony\Component\Console\Helper\ProgressBar;
 class Pm2Apps {
 	
 	private $nodeloc = "/tmp";
+	private $pm2Home = "/tmp";
+	private $webuser = null;
+	private $varlibdir = null;
+	private $astlogdir = null;
+	private $disablelogs = false;
+	private $useproxy = false;
+	private $proxy = null;
 
-	public function __construct(){
+	public function __construct($config = array()){
 		$this->nodeloc = __DIR__."/node";
+		$this->homedir = $config['homedir'];
+		$this->webuser = $config['webuser'];
+		$this->varlibdir = $config['varlibdir'];
+		$this->astlogdir = $config['astlogdir'];
+		$this->disablelogs = $config['disablelogs'];
+		$this->useproxy = $config['useproxy'];
+		$this->proxy = $config['proxy'];
+		$this->shell = $config['shell'];
 	}
 	
 	/**
@@ -125,6 +140,113 @@ class Pm2Apps {
 		return implode( ", ", $times );
 	}
 
+	function safefilerewrite($fileName, $dataToSave) {
+		if ($fp = fopen($fileName, 'w')) {
+			$startTime = microtime(TRUE);
+			do {
+				$canWrite = flock($fp, LOCK_EX);
+				// If lock not obtained sleep for 0 - 100 milliseconds, to avoid collision and CPU load
+				if(!$canWrite) {
+					usleep(round(rand(0, 100)*1000));
+				};
+			} while ((!$canWrite)and((microtime(TRUE)-$startTime) < 5));
+
+			//file was locked so now we can store information
+			if ($canWrite) {
+				fwrite($fp, $dataToSave);
+				flock($fp, LOCK_UN);
+			}
+			fclose($fp);
+		}
+	}
+
+	function write_php_ini($file, $array) {
+		$res = array();
+		foreach($array as $key => $val) {
+			if(is_array($val)) {
+				$res[] = "[$key]";
+				foreach($val as $skey => $sval) {
+					$res[] = "$skey = ".(is_numeric($sval) ? $sval : '"'.$sval.'"');
+				};
+			} else {
+				$res[] = "$key = ".(is_numeric($val) ? $val : '"'.$val.'"');
+			};
+		}
+		$this->safefilerewrite($file, implode("\r\n", $res));
+	}
+
+	/**
+	 * Generate run command string
+	 * @method generateRunAsAsteriskCommand
+	 * @param  string                       $command The command to run
+	 * @param  string                       $environment Array of environment variables to run
+	 * @return string                                The finalized command
+	 */
+	public function generateRunAsAsteriskCommand($command,$cwd='',$environment=array()) {
+		$cwd = !empty($cwd) ? $cwd : $this->nodeloc;
+
+		$npmrc = $this->homedir . "/.npmrc";
+		if(!file_exists($npmrc)) {
+			touch($npmrc);
+			if (posix_getuid() == 0) {
+				chown($npmrc,$this->webuser);
+			}
+		}
+
+		$cmds = array(
+			'cd '.$cwd,
+			'mkdir -p '.$this->pm2Home
+		);
+
+		if(!$this->disablelogs) {
+			$cmds[] = 'mkdir -p '.$cwd.'/logs';
+		}
+
+		$contents = file_get_contents($npmrc);
+		$contents .= "\n";
+		$ini = parse_ini_string($contents, false, INI_SCANNER_RAW);
+		$ini = is_array($ini) ? $ini : array();
+		$ini['prefix'] = '~/.node';
+		if($this->useproxy) {
+			$ini['proxy'] = $this->proxy;
+			$ini['https-proxy'] = $this->proxy;
+			$ini['strict-ssl'] = 'false';
+			$cmds[] = 'export NODE_TLS_REJECT_UNAUTHORIZED=0';
+		} else {
+			unset($ini['proxy'],$ini['https-proxy'],$ini['strict-ssl']);
+		}
+
+		$this->write_php_ini($npmrc,$ini);
+
+		foreach($environment as $k => $v) {
+			if(empty($k) || !is_string($v)) {
+				continue;
+			}
+			$cmds[] = 'export '.escapeshellarg($k).'='.escapeshellarg($v);
+		}
+
+		$cmds = array_merge($cmds,array(
+			'export HOME='.escapeshellcmd($this->homedir),
+			'export PM2_HOME='.escapeshellcmd($this->pm2Home),
+			'export ASTLOGDIR='.escapeshellcmd($this->astlogdir),
+			'export ASTVARLIBDIR='.escapeshellcmd($this->varlibdir),
+			'export PATH=$HOME/.node/bin:$PATH',
+			'export NODE_PATH=$HOME/.node/lib/node_modules:$NODE_PATH',
+			'export MANPATH=$HOME/.node/share/man:$MANPATH',
+
+		));
+		$cmds[] = escapeshellcmd($command);
+		$final = implode(" && ", $cmds);
+
+		if (posix_getuid() == 0) {
+			$shell = $this->shell;
+			$shell = !empty($shell) ? $shell : '/bin/bash';
+			$final = "runuser ".escapeshellarg($this->webuser)." -s ".escapeshellarg($shell)." -c ".escapeshellarg($final);
+		}
+
+		return $final;
+	}
+
 	/**
 	 * Run a command against PM2
 	 * @method runPM2Command
@@ -138,7 +260,7 @@ class Pm2Apps {
 		if(!is_executable($this->nodeloc."/node_modules/pm2/bin/pm2")) {
 			chmod($this->nodeloc."/node_modules/pm2/bin/pm2",0755);
 		}
-		$command = \FreePBX::pm2()->generateRunAsAsteriskCommand($this->nodeloc."/node_modules/pm2/bin/pm2 ".$cmd,$cwd,$environment);
+		$command = $this->generateRunAsAsteriskCommand($this->nodeloc."/node_modules/pm2/bin/pm2 ".$cmd,$cwd,$environment);
 		$process = new Process($command);
 		$process->setIdleTimeout($timeout);
 		if(!empty($idleTimeout)) {
