@@ -24,7 +24,7 @@ class Pm2 extends Base {
 					'fetchPm2AppStatus' => [
 						'type' => $this->typeContainer->get('pm2')->getConnectionType(),
 						'resolve' => function($root, $args) {
-                     $res = $this->freepbx->pm2->getPm2AppsObj()->getAppStatus();
+							$res = $this->freepbx->pm2->pm2Apps()->getAppStatus();
 							if(!empty($res)){
 								return ['message' => _('Kindly follow the pm2 apps and their status'), 'status' => true, 'response' => $res];
 							}else{
