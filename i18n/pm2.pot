@@ -3,13 +3,13 @@
 # For licensing information, please see the file named LICENSE located in the module directory
 #
 # FreePBX language template for pm2
-# Copyright (C) 2008-2020 Sangoma Technologies, Inc.
+# Copyright (C) 2008-2021 Sangoma Technologies, Inc.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-19 14:07+0000\n"
+"POT-Creation-Date: 2021-05-04 00:58+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,7 +22,7 @@ msgstr ""
 msgid "Admin"
 msgstr ""
 
-#: Pm2.class.php:411
+#: Pm2.class.php:378
 #, php-format
 msgid ""
 "Asterisk home dir (%s) doesn't exist, and, ASTSPOOLDIR doesn't exist. "
@@ -41,11 +41,11 @@ msgstr ""
 msgid "Disable PM2 Logging"
 msgstr ""
 
-#: Pm2.class.php:144
+#: Pm2.class.php:145
 msgid "Finished updating libraries!"
 msgstr ""
 
-#: Pm2.class.php:53 /usr/src/freepbx/pm2/Pm2.class.php:63
+#: Pm2.class.php:54 /usr/src/freepbx/pm2/Pm2.class.php:64
 #, php-format
 msgid "Home directory [%s] is not writable"
 msgstr ""
@@ -54,8 +54,12 @@ msgstr ""
 msgid "How many lines to stream"
 msgstr ""
 
-#: Pm2.class.php:135
+#: Pm2.class.php:136
 msgid "Installing/Updating Required Libraries. This may take a while..."
+msgstr ""
+
+#: Api/Gql/Pm2.php:29
+msgid "Kindly follow the pm2 apps and their status"
 msgstr ""
 
 #: Console/Pm2.class.php:21
@@ -74,26 +78,39 @@ msgstr ""
 msgid "Mem"
 msgstr ""
 
+#: Api/Gql/Pm2.php:80
+msgid "Memory used by the app"
+msgstr ""
+
+#: Api/Gql/Pm2.php:64
+#: Api/Gql/Pm2.php:103
+msgid "Message for the request"
+msgstr ""
+
 #: pm2.i18n.php:16
 msgid "NPM Proxy Server Address"
 msgstr ""
 
-#: Pm2.class.php:45
+#: Pm2.class.php:46
 #, php-format
 msgid ""
 "NPM version is: %s requirement is %s. Run 'yum upgrade nodejs' from the CLI "
 "as root"
 msgstr ""
 
-#: Pm2.class.php:41
+#: Api/Gql/Pm2.php:68
+msgid "Name od the app"
+msgstr ""
+
+#: Pm2.class.php:42
 msgid "Node Package Manager is not installed"
 msgstr ""
 
-#: Pm2.class.php:29
+#: Pm2.class.php:30
 msgid "Node is not installed"
 msgstr ""
 
-#: Pm2.class.php:33
+#: Pm2.class.php:34
 #, php-format
 msgid ""
 "Node version is: %s requirement is %s. Run 'yum upgrade nodejs' from the CLI "
@@ -106,6 +123,14 @@ msgstr ""
 
 #: Console/Pm2.class.php:35
 msgid "Process Name"
+msgstr ""
+
+#: Api/Gql/Pm2.php:72
+msgid "Process id for the app"
+msgstr ""
+
+#: Api/Gql/Pm2.php:47
+msgid "Process management"
 msgstr ""
 
 #: Console/Pm2.class.php:26
@@ -128,8 +153,24 @@ msgstr ""
 msgid "Shell Executable"
 msgstr ""
 
+#: Api/Gql/Pm2.php:31
+msgid "Sorry unable to find the pm2apps status"
+msgstr ""
+
 #: Console/Pm2.class.php:35
 msgid "Status"
+msgstr ""
+
+#: Api/Gql/Pm2.php:107
+msgid "Status for the request"
+msgstr ""
+
+#: Api/Gql/Pm2.php:76
+msgid "Status of the app"
+msgstr ""
+
+#: Api/Gql/Pm2.php:60
+msgid "Status of the request"
 msgstr ""
 
 #: Console/Pm2.class.php:22
@@ -144,11 +185,11 @@ msgstr ""
 msgid "The NPM Proxy server address to use"
 msgstr ""
 
-#: Pm2.class.php:148
+#: Pm2.class.php:149
 msgid "There was an error installing and PM2 Logging is disabled"
 msgstr ""
 
-#: Pm2.class.php:150
+#: Pm2.class.php:151
 #, php-format
 msgid "There was an error installing. Please review the install log. (%s)"
 msgstr ""
@@ -171,6 +212,10 @@ msgstr ""
 
 #: Console/Pm2.class.php:35
 msgid "Uptime"
+msgstr ""
+
+#: Api/Gql/Pm2.php:84
+msgid "Uptime of the app"
 msgstr ""
 
 #: pm2.i18n.php:28
