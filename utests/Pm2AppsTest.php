@@ -52,7 +52,7 @@ class Pm2AppsTest extends \PHPUnit_Framework_TestCase {
 
 		$this->assertTrue(ProcessMock::isInstantiated());
 		$this->assertEquals(
-			"runuser 'asterisk' -s '/bin/bash' -c 'cd /usr/src/freepbx/pm2/node && mkdir -p /tmp && export HOME=/tmp/pm2test/homedir && export PM2_HOME=/tmp && export ASTLOGDIR=/tmp/pm2test/astlogdir && export ASTVARLIBDIR=/tmp/pm2test/varlibdir && export PATH=\$HOME/.node/bin:\$PATH && export NODE_PATH=\$HOME/.node/lib/node_modules:\$NODE_PATH && export MANPATH=\$HOME/.node/share/man:\$MANPATH && /usr/src/freepbx/pm2/node/node_modules/pm2/bin/pm2 testcommand'", 
+			"runuser 'asterisk' -s '/bin/bash' -c 'cd /usr/src/freepbx/pm2/node && mkdir -p /tmp/pm2test/homedir/.pm2 && export HOME=/tmp/pm2test/homedir && export PM2_HOME=/tmp/pm2test/homedir/.pm2 && export ASTLOGDIR=/tmp/pm2test/astlogdir && export ASTVARLIBDIR=/tmp/pm2test/varlibdir && export PATH=\$HOME/.node/bin:\$PATH && export NODE_PATH=\$HOME/.node/lib/node_modules:\$NODE_PATH && export MANPATH=\$HOME/.node/share/man:\$MANPATH && /usr/src/freepbx/pm2/node/node_modules/pm2/bin/pm2 testcommand'", 
 			ProcessMock::getCommand()
 		);
 		$this->assertEquals('command response goes here', $response);
