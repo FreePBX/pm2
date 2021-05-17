@@ -10,7 +10,8 @@ use Symfony\Component\Console\Helper\ProgressBar;
 class Pm2Apps {
 	
 	private $nodeloc = "/tmp";
-	private $pm2Home = "/tmp";
+	private $homedir = null;
+	private $pm2Home = null;
 	private $webuser = null;
 	private $varlibdir = null;
 	private $astlogdir = null;
@@ -21,6 +22,7 @@ class Pm2Apps {
 	public function __construct($config = array()){
 		$this->nodeloc = __DIR__."/node";
 		$this->homedir = $config['homedir'];
+		$this->pm2Home = $config['homedir'] . "/.pm2";
 		$this->webuser = $config['webuser'];
 		$this->varlibdir = $config['varlibdir'];
 		$this->astlogdir = $config['astlogdir'];
