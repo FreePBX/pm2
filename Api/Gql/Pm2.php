@@ -70,18 +70,46 @@ class Pm2 extends Base {
 				'PID' =>[
 				   'type' => Type::string(),
 				   'description' => _('Process id for the app'),
+					'resolve' => function($root, $args) {
+						if(isset($root['PID'])){
+							return $root['PID'];
+						}else{
+							return 0;
+						}
+					}
 				],
 				'status' =>[
 				   'type' => Type::string(),
 				   'description' => _('Status of the app'),
+					'resolve' => function($root, $args) {
+					if(isset($root['status'])){
+							return $root['status'];
+						}else{
+							return null;
+						}
+					}
 				],
 				'memory' =>[
 				   'type' => Type::string(),
 				   'description' => _('Memory used by the app'),
+					'resolve' => function($root, $args) {
+					if(isset($root['memory'])){
+							return $root['memory'];
+						}else{
+							return null;
+						}
+					}
 				],
 				'uptime' =>[
 				   'type' => Type::string(),
 				   'description' => _('Uptime of the app'),
+					'resolve' => function($root, $args) {
+					if(isset($root['uptime'])){
+							return $root['uptime'];
+						}else{
+							return null;
+						}
+					}
 				]
 			];
 		});
