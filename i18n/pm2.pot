@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-17 12:56+0000\n"
+"POT-Creation-Date: 2021-08-04 14:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,7 +45,7 @@ msgstr ""
 msgid "Finished updating libraries!"
 msgstr ""
 
-#: Pm2.class.php:54 /usr/src/freepbx/pm2/Pm2.class.php:64
+#: Pm2.class.php:54 /dev/shm/freepbx/pm2/Pm2.class.php:64
 #, php-format
 msgid "Home directory [%s] is not writable"
 msgstr ""
@@ -78,12 +78,12 @@ msgstr ""
 msgid "Mem"
 msgstr ""
 
-#: Api/Gql/Pm2.php:80
+#: Api/Gql/Pm2.php:94
 msgid "Memory used by the app"
 msgstr ""
 
 #: Api/Gql/Pm2.php:64
-#: Api/Gql/Pm2.php:103
+#: Api/Gql/Pm2.php:131
 msgid "Message for the request"
 msgstr ""
 
@@ -117,7 +117,7 @@ msgid ""
 "as root"
 msgstr ""
 
-#: pm2.i18n.php:4 /usr/src/freepbx/pm2/pm2.i18n.php:12
+#: pm2.i18n.php:4 /dev/shm/freepbx/pm2/pm2.i18n.php:12
 msgid "Process Management"
 msgstr ""
 
@@ -161,11 +161,11 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-#: Api/Gql/Pm2.php:107
+#: Api/Gql/Pm2.php:135
 msgid "Status for the request"
 msgstr ""
 
-#: Api/Gql/Pm2.php:76
+#: Api/Gql/Pm2.php:83
 msgid "Status of the app"
 msgstr ""
 
@@ -214,7 +214,7 @@ msgstr ""
 msgid "Uptime"
 msgstr ""
 
-#: Api/Gql/Pm2.php:84
+#: Api/Gql/Pm2.php:105
 msgid "Uptime of the app"
 msgstr ""
 
