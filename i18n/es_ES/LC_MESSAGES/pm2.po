@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-27 09:48+0000\n"
+"POT-Creation-Date: 2022-01-27 09:49+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,7 +45,7 @@ msgstr ""
 msgid "Finished updating libraries!"
 msgstr ""
 
-#: Pm2.class.php:54 /dev/shm/freepbx/pm2/Pm2.class.php:64
+#: Pm2.class.php:54 /usr/src/freepbx/pm2/Pm2.class.php:64
 #, php-format
 msgid "Home directory [%s] is not writable"
 msgstr ""
@@ -116,7 +116,7 @@ msgid ""
 "as root"
 msgstr ""
 
-#: pm2.i18n.php:4 /dev/shm/freepbx/pm2/pm2.i18n.php:12
+#: pm2.i18n.php:4 /usr/src/freepbx/pm2/pm2.i18n.php:12
 msgid "Process Management"
 msgstr ""
 

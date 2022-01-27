@@ -226,7 +226,6 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$cwd = dirname($process);
 		$args = !empty($processParts[1]) ? ' -- '.$processParts[1] : '';
 		$this->pm2Apps()->runPM2Command("start ".$processParts[0]." ".$force." --update-env --name ".escapeshellarg($name)." -e ".escapeshellarg($errorLog)." -o ".escapeshellarg($outLog)." --log ".escapeshellarg("/dev/null")." --merge-logs --log-date-format 'YYYY-MM-DD HH:mm Z'".$args, $cwd, $environment);
-		$this->freepbx->Hooks->processHooks($name);
 		return $this->getStatus($name);
 	}
 
@@ -276,6 +275,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			throw new \Exception("There is no process by that name");
 		}
 		$this->pm2Apps()->runPM2Command("restart ".$name." --update-env");
+		$this->freepbx->Hooks->processHooks($name);
 	}
 
 	/**
