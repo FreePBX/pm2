@@ -275,7 +275,6 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			throw new \Exception("There is no process by that name");
 		}
 		$this->pm2Apps()->runPM2Command("restart ".$name." --update-env");
-		$this->freepbx->Hooks->processHooks($name);
 	}
 
 	/**
