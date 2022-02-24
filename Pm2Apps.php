@@ -48,7 +48,7 @@ class Pm2Apps {
 		$final = array();
 		foreach($processes as $process) {
 			$result = array();
-			$result['PID'] = $process['pid'];
+			$result['PID'] = isset($process['pid'])? $process['pid']: '';
 			$result['name'] = $process['name'];
 			$result['status'] = $process['pm2_env']['status'];
 			$result['uptime']  = ($process['pm2_env']['status'] == 'online') ? $this->get_date_diff(time(),(int)round($process['pm2_env']['pm_uptime']/1000)) : 0;
