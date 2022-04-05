@@ -2,13 +2,14 @@
 	<rawname>pm2</rawname>
 	<repo>standard</repo>
 	<name>Process Management</name>
-	<version>13.0.7.3</version>
+	<version>14.0.1.1</version>
 	<publisher>Sangoma Technologies Corporation</publisher>
 	<license>AGPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/agpl-3.0.txt</licenselink>
 	<category>Admin</category>
 	<description>This module manages background processes for your PBX</description>
 	<changelog>
+		*14.0.1.1* Change branch for 14.
 		*13.0.7.3* Fixing PM2 NodeJS lib dependency issue 
 		*13.0.7.2* FREEI-1590 Fixed hanging issue caused by --reload-logs
 		*13.0.7.1* Dependency issue fix
@@ -54,6 +55,6 @@
 		</framework>
 	</hooks>
 	<supported>
-		<version>13.0</version>
+		<version>14.0</version>
 	</supported>
 </module>
