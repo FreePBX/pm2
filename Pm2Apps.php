@@ -263,7 +263,7 @@ class Pm2Apps {
 			chmod($this->nodeloc."/node_modules/pm2/bin/pm2",0755);
 		}
 		$command = $this->generateRunAsAsteriskCommand($this->nodeloc."/node_modules/pm2/bin/pm2 ".$cmd,$cwd,$environment);
-		$process = new Process($command);
+		$process = Process::fromShellCommandline($command);
 		$process->setIdleTimeout($timeout);
 		if(!empty($idleTimeout)) {
 			$process->setTimeout($idleTimeout);
