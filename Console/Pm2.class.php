@@ -47,7 +47,7 @@ class Pm2 extends Command {
 			}
 			$table->setRows($rows);
 			$table->render();
-			return;
+			return 0;
 		}
 		if($input->getOption('log')){
 			$app = $input->getOption('log');
@@ -72,36 +72,36 @@ class Pm2 extends Command {
 					echo 'OUT > '.$buffer;
 				}
 			});
-			return;
+			return 0;
 		}
 		if($input->getOption('restart')){
 			$app = $input->getOption('restart');
 			\FreePBX::Pm2()->restart($app);
 			$output->writeln("Process Restarted");
-			return;
+			return 0;
 		}
 		if($input->getOption('stop')){
 			$app = $input->getOption('stop');
 			\FreePBX::Pm2()->stop($app);
 			$output->writeln("Process Stopped");
-			return;
+			return 0;
 		}
 		if($input->getOption('update')){
 			$app = $input->getOption('update');
 			\FreePBX::Pm2()->update();
 			$output->writeln("Update PM2 Process");
-			return;
+			return 0;
 		}
 		if($input->getOption('delete')){
 			$app = $input->getOption('delete');
 			\FreePBX::Pm2()->delete($app);
 			$output->writeln("Process Stopped and Deleted");
-			return;
+			return 0;
 		}
 		if($input->getOption('reload-logs')){
 			\FreePBX::Pm2()->reloadLogs();
 			$output->writeln("All logs reloaded");
-			return;
+			return 0;
 		}
 		$this->outputHelp($input,$output);
 	}
