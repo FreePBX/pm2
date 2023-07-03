@@ -385,7 +385,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$cwd = !empty($cwd) ? $cwd : $this->nodeloc;
 		if($this->freepbx->Config->get('PM2USECACHE')) {
 			$command = $this->pm2Apps()->generateRunAsAsteriskCommand('npm-cache -v',$cwd,$environment);
-			$process = Process::fromShellCommandline($command);
+			$process = \freepbx_get_process_obj($command);
 			try {
 				$process->mustRun();
 				if(is_callable($callback)) {
@@ -396,7 +396,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 				exec($command);
 
 				$command = $this->pm2Apps()->generateRunAsAsteriskCommand('npm-cache -v',$cwd,$environment);
-				$process = Process::fromShellCommandline($command);
+				$process = \freepbx_get_process_obj($command);
 				try {
 					$process->mustRun();
 					if(is_callable($callback)) {
@@ -450,7 +450,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			}
 		};
 		try {
-			$process = Process::fromShellCommandline($command);
+			$process = \freepbx_get_process_obj($command);
 			$process->setTimeout(3600);
 			$process->setIdleTimeout(600);
 			$process->run(function ($type, $buffer) use ($output) {
