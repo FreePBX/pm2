@@ -37,7 +37,7 @@ class Pm2 extends Command {
 			foreach($data as $process) {
 				$rows[] = array(
 					$process['name'],
-					$process['pid'],
+					$process['pid']??='',
 					$process['pm2_env']['status'],
 					$process['pm2_env']['restart_time'],
 					$process['pm2_env']['created_at_human_diff'],
@@ -104,6 +104,7 @@ class Pm2 extends Command {
 			return 0;
 		}
 		$this->outputHelp($input,$output);
+		return 0;
 	}
 
 	/**
