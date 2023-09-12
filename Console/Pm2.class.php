@@ -13,6 +13,7 @@ use Symfony\Component\Process\Process;
 
 use Symfony\Component\Console\Command\HelpCommand;
 
+#[\AllowDynamicProperties]
 class Pm2 extends Command {
 	protected function configure(){
 		$this->setName('pm2')
