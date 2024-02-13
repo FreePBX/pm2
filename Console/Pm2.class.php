@@ -61,9 +61,8 @@ class Pm2 extends Command {
 				$status['pm2_env']['pm_err_log_path'],
 				$status['pm2_env']['pm_out_log_path']
 			);
-			$files = implode(' ', $logs);
 			//passthru('tail -f ' . $files);
-			$process = \freepbx_get_process_obj(['tail', '--lines='.$lines, '-f', $files]);
+			$process = \freepbx_get_process_obj(['tail', '--lines='.$lines, '-f', ...$logs]);
 			//Timeout for the above process. Not sure if there is a no limit but 42 Years seems long enough.
 			$process->setTimeout(1325390892);
 			$process->run(function ($type, $buffer) {
