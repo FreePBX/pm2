@@ -142,6 +142,12 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 			outn($data);
 		});
 		out("");
+		
+		if(!file_exists($this->nodeloc."/node_modules/pm2/bin/pm2")) {
+			out(_("Node packages are not installed properly. Re-running the installation without using the existing cache."));
+			$this->installNodeDependencies('',function($data) {outn($data);},[],true,true);
+		}
+		
 		out(_("Finished updating libraries!"));
 		if(!file_exists($this->nodeloc."/node_modules/pm2/bin/pm2")) {
 			out("");
@@ -381,7 +387,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		return $home;
 	}
 
-	public function installNodeDependencies($cwd='',$callback=null,$environment=array(),$production=true) {
+	public function installNodeDependencies($cwd='',$callback=null,$environment=array(),$production=true, $force=false) {
 		$cwd = !empty($cwd) ? $cwd : $this->nodeloc;
 		if($this->freepbx->Config->get('PM2USECACHE')) {
 			$command = $this->pm2Apps()->generateRunAsAsteriskCommand('npm-cache -v',$cwd,$environment);
@@ -428,7 +434,11 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 
 		$prod = ($production) ? ' --only=production' : '';
 		if($this->freepbx->Config->get('PM2USECACHE')) {
-			$command = $this->pm2Apps()->generateRunAsAsteriskCommand('npm-cache install'.$prod,$cwd,$environment);
+			if($force){
+				$command = $this->pm2Apps()->generateRunAsAsteriskCommand('npm-cache install --forceRefresh'.$prod,$cwd,$environment);
+			} else {
+				$command = $this->pm2Apps()->generateRunAsAsteriskCommand('npm-cache install'.$prod,$cwd,$environment);
+			}
 		} else {
 			$command = $this->pm2Apps()->generateRunAsAsteriskCommand('npm install'.$prod,$cwd,$environment);
 		}
