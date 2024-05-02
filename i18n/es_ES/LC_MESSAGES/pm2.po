@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-27 01:05-0500\n"
+"POT-Creation-Date: 2024-05-02 03:28-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,7 +22,7 @@ msgstr ""
 msgid "Admin"
 msgstr ""
 
-#: Pm2.class.php:384
+#: Pm2.class.php:371
 #, php-format
 msgid ""
 "Asterisk home dir (%s) doesn't exist, and, ASTSPOOLDIR doesn't exist. "
@@ -37,7 +37,7 @@ msgstr ""
 msgid "Delete Process"
 msgstr ""
 
-#: Pm2.class.php:151
+#: Pm2.class.php:138
 msgid "Finished updating libraries!"
 msgstr ""
 
@@ -50,7 +50,7 @@ msgstr ""
 msgid "How many lines to stream"
 msgstr ""
 
-#: Pm2.class.php:136
+#: Pm2.class.php:123
 msgid "Installing/Updating Required Libraries. This may take a while..."
 msgstr ""
 
@@ -97,7 +97,7 @@ msgstr ""
 msgid "Node is not installed"
 msgstr ""
 
-#: Pm2.class.php:147
+#: Pm2.class.php:134
 msgid ""
 "Node packages are not installed properly. Re-running the installation "
 "without using the existing cache."
@@ -170,11 +170,11 @@ msgstr ""
 msgid "Stream Logs from Process"
 msgstr ""
 
-#: Pm2.class.php:155
+#: Pm2.class.php:142
 msgid "There was an error installing and PM2 Logging is disabled"
 msgstr ""
 
-#: Pm2.class.php:157
+#: Pm2.class.php:144
 #, php-format
 msgid "There was an error installing. Please review the install log. (%s)"
 msgstr ""
