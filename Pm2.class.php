@@ -396,6 +396,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 
 		$prod = ($production) ? ' --only=production' : '';
 		$command = $this->pm2Apps()->generateRunAsAsteriskCommand('npm install'.$prod,$cwd,$environment);
+		$log = "";
 		if(!$PM2DISABLELOG) {
 			$log = fopen($cwd."/logs/install.log", "a");
 		}
