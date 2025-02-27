@@ -58,7 +58,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		if(file_exists($this->getHomeDir()."/.npm")) {
 			$data = posix_getgrgid(filegroup($this->getHomeDir()."/.npm"));
 			if($data['name'] != $webgroup) {
-				if (posix_getuid() == 0) {
+				if ((posix_getuid() != false) && (posix_getuid() == 0)) { //root user
 					exec("chown -R ".$webuser." ".$this->getHomeDir()."/.npm");
 				} else {
 					out(sprintf(_("Home directory [%s] is not writable"),$this->getHomeDir()."/.npm"));
