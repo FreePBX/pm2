@@ -13,9 +13,8 @@ use Symfony\Component\Process\Process;
 
 use Symfony\Component\Console\Command\HelpCommand;
 
-#[\AllowDynamicProperties]
 class Pm2 extends Command {
-	protected function configure(){
+	protected function configure(): void{
 		$this->setName('pm2')
 		->setDescription(_('Manage long running processes'))
 		->setDefinition(array(
@@ -29,7 +28,7 @@ class Pm2 extends Command {
 			new InputOption('lines', null, InputOption::VALUE_REQUIRED, _('How many lines to stream'))
 		));
 	}
-	protected function execute(InputInterface $input, OutputInterface $output){
+	protected function execute(InputInterface $input, OutputInterface $output): int{
 		if($input->getOption('list')){
 			$data = \FreePBX::Pm2()->listProcesses();
 			$table = new Table($output);
@@ -37,13 +36,13 @@ class Pm2 extends Command {
 			$rows = array();
 			foreach($data as $process) {
 				$rows[] = array(
-					$process['name'],
-					$process['pid']??='',
-					$process['pm2_env']['status'],
-					$process['pm2_env']['restart_time'],
-					$process['pm2_env']['created_at_human_diff'],
-					$process['monit']['cpu'].'%',
-					$process['monit']['human_memory'],
+					$process['name'] ?? '',
+					$process['pid'] ?? '',
+					$process['pm2_env']['status'] ?? '',
+					$process['pm2_env']['restart_time'] ?? 0,
+					$process['pm2_env']['created_at_human_diff'] ?? 0,
+					($process['monit']['cpu'] ?? 0).'%',
+					$process['monit']['human_memory'] ?? '',
 				);
 			}
 			$table->setRows($rows);
@@ -57,10 +56,16 @@ class Pm2 extends Command {
 				$lines = $input->getOption('lines');
 			}
 			$status = \FreePBX::Pm2()->getStatus($app);
+			if (empty($status)) {
+				throw new \RuntimeException("There is no process by that name");
+			}
 			$logs = array(
-				$status['pm2_env']['pm_err_log_path'],
-				$status['pm2_env']['pm_out_log_path']
+				$status['pm2_env']['pm_err_log_path'] ?? '',
+				$status['pm2_env']['pm_out_log_path'] ?? ''
 			);
+			if (in_array('', $logs, true)) {
+				throw new \RuntimeException("Log paths are unavailable for this process");
+			}
 			//passthru('tail -f ' . $files);
 			$process = \freepbx_get_process_obj(['tail', '--lines='.$lines, '-f', ...$logs]);
 			//Timeout for the above process. Not sure if there is a no limit but 42 Years seems long enough.

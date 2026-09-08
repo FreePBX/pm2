@@ -9,7 +9,6 @@ use FreePBX\modules\Api\Gql\Base;
 /**
  * Pm2
  */
-#[\AllowDynamicProperties]
 class Pm2 extends Base {
 	protected $module = 'Pm2';
 	

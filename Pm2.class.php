@@ -9,10 +9,13 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 use Symfony\Component\Console\Helper\ProgressBar;
 class Pm2 extends \FreePBX_Helpers implements \BMO {
-	private $nodever = "0.12.18";
+	private $nodever = "18.0.0";
 	private $npmver = "2.15.11";
 	private $pm2Home = "/tmp";
 	private $nodeloc = "/tmp";
+	private $astman = null;
+	private $db = null;
+	private $freepbx = null;
 	private static $pm2app = false;
 
 	public function __construct($freepbx = null) {
@@ -48,6 +51,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		}
 
 		$webgroup = $this->freepbx->Config->get('AMPASTERISKWEBGROUP');
+		$webuser = $this->freepbx->Config->get('AMPASTERISKWEBUSER');
 
 		$data = posix_getgrgid(filegroup($this->getHomeDir()));
 		if($data['name'] != $webgroup) {
@@ -204,7 +208,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	public function start($name, $process, $environment=array(), $force = false) {
 		$name = $this->cleanAppName($name);
 		$pout = $this->getStatus($name);
-		if(!$force && !empty($pout) && $pout['pm2_env']['status'] == 'online') {
+		if(!$force && !empty($pout) && ($pout['pm2_env']['status'] ?? '') == 'online') {
 			throw new \Exception("There is already a process by that name running!");
 		}
 		try {
@@ -225,7 +229,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	public function startFromDirectory($name, $process, $directory, $environment=array(), $force = false) {
 		$name = $this->cleanAppName($name);
 		$pout = $this->getStatus($name);
-		if(!$force && !empty($pout) && $pout['pm2_env']['status'] == 'online') {
+		if(!$force && !empty($pout) && ($pout['pm2_env']['status'] ?? '') == 'online') {
 			throw new \Exception("There is already a process by that name running!");
 		}
 		try {
@@ -335,8 +339,10 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		$processes = (!empty($processes) && is_array($processes)) ? $processes : array();
 		$final = array();
 		foreach($processes as $process) {
-			$process['pm2_env']['created_at_human_diff'] = ($process['pm2_env']['status'] == 'online') ? $this->pm2Apps()->get_date_diff(time(),(int)round($process['pm2_env']['created_at']/1000)) : 0;
-			$process['monit']['human_memory'] = $this->pm2Apps()->human_filesize($process['monit']['memory']);
+			$status = $process['pm2_env']['status'] ?? '';
+			$createdAt = $process['pm2_env']['created_at'] ?? 0;
+			$process['pm2_env']['created_at_human_diff'] = ($status == 'online' && $createdAt > 0) ? $this->pm2Apps()->get_date_diff(time(),(int)round($createdAt/1000)) : 0;
+			$process['monit']['human_memory'] = $this->pm2Apps()->human_filesize($process['monit']['memory'] ?? 0);
 			$final[] = $process;
 		}
 		return $final;
@@ -416,6 +422,9 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 		};
 		try {
 			$process = \freepbx_get_process_obj($command);
+			if (!$process instanceof Process) {
+				throw new \RuntimeException("Unable to create process for npm install");
+			}
 			$process->setTimeout(3600);
 			$process->setIdleTimeout(600);
 			$process->run(function ($type, $buffer) use ($output) {
@@ -456,9 +465,9 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 	 */
 	public function pm2Apps() {
 		if (!self::$pm2app) {
-			if (!class_exists('FreePBX\\modules\\pm2\Pm2Apps')) {
-				include_once __DIR__."/admin/modules/pm2/Pm2Apps.php";
-            }
+			if (!class_exists('FreePBX\\modules\\Pm2\\Pm2Apps')) {
+				include_once __DIR__."/Pm2Apps.php";
+			}
 
 			$config = array(
 				'homedir' => $this->getHomeDir(),
@@ -470,7 +479,7 @@ class Pm2 extends \FreePBX_Helpers implements \BMO {
 				'proxy' => $this->freepbx->Config->get('PM2PROXY'),
 				'shell' => $this->freepbx->Config->get('PM2SHELL'),
 			);
-			self::$pm2app = new \FreePBX\modules\pm2\Pm2Apps($config);
+			self::$pm2app = new \FreePBX\modules\Pm2\Pm2Apps($config);
 		}
 		return self::$pm2app;
 	}
