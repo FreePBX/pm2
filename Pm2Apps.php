@@ -6,7 +6,6 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 use Symfony\Component\Console\Helper\ProgressBar;
-#[\AllowDynamicProperties]
 class Pm2Apps {
 	
 	private $nodeloc = "/tmp";
@@ -18,6 +17,7 @@ class Pm2Apps {
 	private $disablelogs = false;
 	private $useproxy = false;
 	private $proxy = null;
+	private $shell = null;
 
 	public function __construct($config = array()){
 		$this->nodeloc = __DIR__."/node";
@@ -49,10 +49,11 @@ class Pm2Apps {
 		foreach($processes as $process) {
 			$result = array();
 			$result['PID'] = isset($process['pid'])? $process['pid']: '';
-			$result['name'] = $process['name'];
-			$result['status'] = $process['pm2_env']['status'];
-			$result['uptime']  = ($process['pm2_env']['status'] == 'online') ? $this->get_date_diff(time(),(int)round($process['pm2_env']['pm_uptime']/1000)) : 0;
-			$result['memory'] = $this->human_filesize($process['monit']['memory']);
+			$result['name'] = $process['name'] ?? '';
+			$result['status'] = $process['pm2_env']['status'] ?? '';
+			$uptime = $process['pm2_env']['pm_uptime'] ?? 0;
+			$result['uptime']  = ($result['status'] == 'online' && $uptime > 0) ? $this->get_date_diff(time(),(int)round($uptime/1000)) : 0;
+			$result['memory'] = $this->human_filesize($process['monit']['memory'] ?? 0);
 
 			array_push($final,$result);
 		}
@@ -68,7 +69,8 @@ class Pm2Apps {
 	 */
 	public function human_filesize($bytes, $dec = 2) {
 		$size   = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
-		$factor = floor((strlen($bytes) - 1) / 3);
+		$bytes = (int)($bytes ?? 0);
+		$factor = floor((strlen((string)$bytes) - 1) / 3);
 
 		return sprintf("%.{$dec}f", $bytes / pow(1024, $factor)) . @$size[$factor];
 	}
@@ -264,6 +266,9 @@ class Pm2Apps {
 		}
 		$command = $this->generateRunAsAsteriskCommand($this->nodeloc."/node_modules/pm2/bin/pm2 ".$cmd,$cwd,$environment);
 		$process = \freepbx_get_process_obj($command);
+		if (!$process instanceof Process) {
+			throw new \RuntimeException("Unable to create PM2 process");
+		}
 		$process->setIdleTimeout($timeout);
 		if(!empty($idleTimeout)) {
 			$process->setTimeout($idleTimeout);
